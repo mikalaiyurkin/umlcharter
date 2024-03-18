@@ -5,19 +5,21 @@ from charter.charts.sequence_diagram import (
     SequenceDiagramParticipant,
     Step,
     ParticipantActivationControl,
-    SequenceStep,
+    ForwardStep,
     GroupControl,
     LoopControl,
     ConditionControl,
-    CaseControl
+    CaseControl,
+    ReturnStep,
 )
 
 
 class MermaidSequenceDiagram:
-
     @classmethod
     def generate(cls, sequence_diagram: SequenceDiagram) -> str:
-        participants: list[SequenceDiagramParticipant] = sequence_diagram._SequenceDiagram__participants  # noqa
+        participants: list[
+            SequenceDiagramParticipant
+        ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: list[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
         last_targeted_participant: SequenceDiagramParticipant | None = None
@@ -25,15 +27,17 @@ class MermaidSequenceDiagram:
             last_targeted_participant = participants[0]
 
         # iterate over the color groups, so the groups are not overlapping and separately visible
-        group_colors = itertools.cycle([
-            # some random colors I've picked
-            "rgb(121, 210, 166, 0.5)",
-            "rgb(51, 153, 102, 0.5)",
-            "rgb(153, 221, 255, 0.5)",
-            "rgb(51, 187, 255, 0.5)",
-            "rgb(0, 179, 179, 0.5)",
-            "rgb(184, 184, 148, 0.5)",
-        ])
+        group_colors = itertools.cycle(
+            [
+                # some random colors I've picked
+                "rgb(121, 210, 166)",
+                "rgb(51, 153, 102)",
+                "rgb(153, 221, 255)",
+                "rgb(51, 187, 255)",
+                "rgb(0, 179, 179)",
+                "rgb(184, 184, 148)",
+            ]
+        )
 
         first_case = False
 
@@ -78,8 +82,11 @@ class MermaidSequenceDiagram:
                     else:
                         generated += f"else {step.text}\n"
 
-            if isinstance(step, SequenceStep):
+            if isinstance(step, ForwardStep):
                 generated += f"{step.from_participant.title}->>{step.to_participant.title}: {step.text}\n"
                 last_targeted_participant = step.to_participant
+
+            if isinstance(step, ReturnStep):
+                generated += f"{step.from_participant.title}-->>{step.to_participant.title}: {step.text}\n"
 
         return generated

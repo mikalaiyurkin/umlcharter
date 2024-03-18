@@ -7,6 +7,7 @@ class IChartGenerator(ABC):
     """
     Abstract parent class for the generators. Define the interfaces.
     """
+
     ref: BaseChart
 
     def __init__(self, ref: BaseChart):
@@ -14,4 +15,3 @@ class IChartGenerator(ABC):
 
     def generate_sequence_diagram(self) -> str:
         raise NotImplementedError
-
