@@ -8,3 +8,6 @@ For details about the mentioned DSLs, please refer to the next links:
 - [Mermaid](https://mermaid.js.org/)
 - [PlantUML](https://plantuml.com/)
 - [ZenUML](https://zenuml.com/)
+
+For the examples of how this package can be used, please check the documentation:
+- [Sequence Diagrams](docs/sequence_diagram/README.md)
