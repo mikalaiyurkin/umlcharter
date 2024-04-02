@@ -130,7 +130,8 @@ For more specific examples and extended functionality, please refer to the rest 
 
 <details>
 <summary><h3>Manual activation control</h3></summary>
-It is possible to control the activation of the participant manually using the `.activate()` context manager:
+
+It is possible to control the activation of the participant manually using the `activate` context manager:
 
 ##### Mermaid
 ```python
@@ -158,6 +159,7 @@ print(sd.generate())
 <summary><h3>Group actions</h3></summary>
 Certain actions in the flow can be grouped to visually amplify the 
 logical relations between the actions.
+
 To do that you have to use the context manager `group` called from the diagram instance
 
 ##### Mermaid
@@ -178,4 +180,29 @@ with sd.group("Group enclosing everything"):
 print(sd.generate())
 ```
 ![Generated image](images/grouping_mermaid.png)
+</details>
+
+<details>
+<summary><h3>Actions in loop</h3></summary>
+Certain actions in the flow can be grouped to visually note these are happening inside a loop.
+
+To identify the group of actions running in a loop, you can use context manager `loop`:
+
+##### Mermaid
+```python
+from umlcharter import SequenceDiagram, Mermaid
+sd = SequenceDiagram("Loops", Mermaid)
+
+first = sd.participant("First")
+second = sd.participant("Second")
+
+with sd.loop("Infinite loop"):
+    first.go_to(second, "Send request to second")
+    with sd.loop("Repeat until available"):
+        second.go_to(second, "Check internal state")
+    sd.return_("Return response")
+
+print(sd.generate())
+```
+![Generated image](images/loop_mermaid.png)
 </details>
