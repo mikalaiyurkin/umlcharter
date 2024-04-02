@@ -1,4 +1,4 @@
-# charter
+# umlcharter
 Python package for quick diagrams creation without a need to learn a new DSL.
 
 The goal of this package is to provide a tool for a convenient and quick creation of the UML diagrams

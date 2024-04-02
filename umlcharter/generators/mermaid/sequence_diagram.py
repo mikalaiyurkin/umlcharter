@@ -1,6 +1,6 @@
 import itertools
 
-from charter.charts.sequence_diagram import (
+from umlcharter.charts.sequence_diagram import (
     SequenceDiagram,
     SequenceDiagramParticipant,
     Step,

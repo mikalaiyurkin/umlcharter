@@ -1,4 +1,4 @@
-from charter.generators.base import IChartGenerator
+from umlcharter.generators.base import IChartGenerator
 
 
 class ZenUML(IChartGenerator):
