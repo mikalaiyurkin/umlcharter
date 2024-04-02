@@ -59,7 +59,9 @@ class SequenceDiagramParticipant:
     sequence_ref: "SequenceDiagram"
     title: str
 
-    def __add_step(self, step: typing.Union[ForwardStep, ReturnStep, ParticipantActivationControl]):
+    def __add_step(
+        self, step: typing.Union[ForwardStep, ReturnStep, ParticipantActivationControl]
+    ):
         self.sequence_ref._SequenceDiagram__add_step(step)  # noqa
 
     def go_to(
@@ -111,10 +113,12 @@ class SequenceDiagram(BaseChart):
 
     __participants: typing.List[SequenceDiagramParticipant] = field(init=False)
     __sequence: typing.List[Step] = field(init=False)
-    __auto_activation_stack: typing.List[typing.Union[
-        typing.Tuple[SequenceDiagramParticipant, SequenceDiagramParticipant],
-        typing.Tuple[None, SequenceDiagramParticipant]
-    ]] = field(init=False)
+    __auto_activation_stack: typing.List[
+        typing.Union[
+            typing.Tuple[SequenceDiagramParticipant, SequenceDiagramParticipant],
+            typing.Tuple[None, SequenceDiagramParticipant],
+        ]
+    ] = field(init=False)
     __generator: IChartGenerator = field(init=False)
     __inside_condition: bool = field(init=False)
 
