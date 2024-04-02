@@ -206,3 +206,43 @@ print(sd.generate())
 ```
 ![Generated image](images/loop_mermaid.png)
 </details>
+
+<details>
+<summary><h3>Conditional actions</h3></summary>
+Certain actions in the flow can be grouped
+to visually identify that these are executed in case of the specific condition being met.
+
+To identify the group of actions running if the condition has been met,
+you can use context manager `condition`
+to identify the beginning of the block
+that runs under the condition and the context manager `case` to specifically name the condition:
+
+##### Mermaid
+```python
+from umlcharter import SequenceDiagram, Mermaid
+sd = SequenceDiagram("Conditions", Mermaid, auto_activation=False)
+
+viewer = sd.participant("Viewer")
+drama = sd.participant("Drama")
+comedy = sd.participant("Comedy")
+
+with viewer.activate():
+    viewer.go_to(viewer, "What would I like to watch today?")
+
+with sd.condition():
+    with sd.case("Want a drama"):
+        with viewer.activate():
+            viewer.go_to(drama, "Watch drama")
+            with drama.activate():
+                drama.return_to(viewer, "Tears and sadness")
+    with sd.case("Want a comedy"):
+        with viewer.activate():
+            viewer.go_to(comedy, "Watch comedy")
+            with comedy.activate():
+                comedy.return_to(viewer, "Laugh a lot")
+
+print(sd.generate())
+```
+![Generated image](images/condition_mermaid.png)
+
+</details>
