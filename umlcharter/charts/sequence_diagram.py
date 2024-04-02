@@ -1,3 +1,4 @@
+import typing
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 
@@ -16,17 +17,17 @@ class Control(Step):
 
 @dataclass
 class LoopControl(Control):
-    how_many_iterations: str | None = None
+    how_many_iterations: typing.Union[str, None] = None
 
 
 @dataclass
 class GroupControl(Control):
-    text: str | None = None
+    text: typing.Union[str, None] = None
 
 
 @dataclass
 class CaseControl(Control):
-    text: str | None = None
+    text: typing.Union[str, None] = None
 
 
 @dataclass
@@ -58,7 +59,7 @@ class SequenceDiagramParticipant:
     sequence_ref: "SequenceDiagram"
     title: str
 
-    def __add_step(self, step: ForwardStep | ReturnStep | ParticipantActivationControl):
+    def __add_step(self, step: typing.Union[ForwardStep, ReturnStep, ParticipantActivationControl]):
         self.sequence_ref._SequenceDiagram__add_step(step)  # noqa
 
     def go_to(
@@ -108,12 +109,12 @@ class SequenceDiagram(BaseChart):
     generator_cls: type[IChartGenerator]
     auto_activation: bool = True
 
-    __participants: list[SequenceDiagramParticipant] = field(init=False)
-    __sequence: list[Step] = field(init=False)
-    __auto_activation_stack: list[
-        tuple[SequenceDiagramParticipant, SequenceDiagramParticipant]
-        | tuple[None, SequenceDiagramParticipant]
-    ] = field(init=False)
+    __participants: typing.List[SequenceDiagramParticipant] = field(init=False)
+    __sequence: typing.List[Step] = field(init=False)
+    __auto_activation_stack: typing.List[typing.Union[
+        typing.Tuple[SequenceDiagramParticipant, SequenceDiagramParticipant],
+        typing.Tuple[None, SequenceDiagramParticipant]
+    ]] = field(init=False)
     __generator: IChartGenerator = field(init=False)
     __inside_condition: bool = field(init=False)
 
