@@ -20,7 +20,7 @@ second.return_to(first, "A result")
 print(sd.generate())
 ```
 The python code from above will print out the following code in [Mermaid](https://mermaid.js.org/) DSL:
-```mermaid
+```text
 sequenceDiagram
 Title: Basic Example
 participant First
