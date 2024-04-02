@@ -108,7 +108,7 @@ class SequenceDiagram(BaseChart):
     """
 
     title: str
-    generator_cls: type[IChartGenerator]
+    generator_cls: typing.Type[IChartGenerator]
     auto_activation: bool = True
 
     __participants: typing.List[SequenceDiagramParticipant] = field(init=False)
