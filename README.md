@@ -1,3 +1,6 @@
+![pypi](https://img.shields.io/pypi/v/umlcharter.svg)
+![versions](https://img.shields.io/pypi/pyversions/umlcharter.svg)
+
 # umlcharter
 Python package for quick diagrams creation without a need to learn a new DSL.
 
