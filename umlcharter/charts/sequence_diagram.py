@@ -1,8 +1,8 @@
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 
-from charter.charts.types import BaseChart
-from charter.generators.base import IChartGenerator
+from umlcharter.charts.types import BaseChart
+from umlcharter.generators.base import IChartGenerator
 
 
 class Step:

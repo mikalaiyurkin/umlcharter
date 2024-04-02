@@ -1,6 +1,6 @@
 import pytest
 
-from charter import SequenceDiagram, Mermaid
+from umlcharter import SequenceDiagram, Mermaid
 
 
 class TestSequenceDiagram:

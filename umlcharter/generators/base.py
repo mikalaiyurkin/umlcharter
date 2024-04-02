@@ -1,6 +1,6 @@
 from abc import ABC
 
-from charter.charts.types import BaseChart
+from umlcharter.charts.types import BaseChart
 
 
 class IChartGenerator(ABC):
