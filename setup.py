@@ -4,7 +4,7 @@ import re
 with open("README.md", "rt") as f:
     long_description = f.read()
 
-with open("umlcharter/metadata.py", "rt") as f:
+with open("umlcharter/__init__.py.py", "rt") as f:
     version = re.search(r"__version__ = \"(.*?)\"", f.read()).group(1)
 
 setuptools.setup(

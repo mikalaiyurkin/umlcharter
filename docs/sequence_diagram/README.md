@@ -246,3 +246,30 @@ print(sd.generate())
 ![Generated image](images/condition_mermaid.png)
 
 </details>
+
+<details>
+<summary><h3>Custom notes</h3></summary>
+It is possible to add the plates with the custom notes to the diagram.
+
+To place the plate with the text, you can use the method `note`.
+These custom notes will be added to the last activated participant in the flow.
+If there is no active participant right now, the first participant will be used. 
+
+##### Mermaid
+```python
+from umlcharter import SequenceDiagram, Mermaid
+sd = SequenceDiagram("Notes", Mermaid)
+
+batman = sd.participant("Batman")
+bandit = sd.participant("Bandit")
+
+sd.note("Batman is throwing\na batarang at the bandit")
+batman.go_to(bandit, "Pheeeeeeu!")
+sd.note("Batman has missed!")
+sd.return_("A bad day\nfor the Gotham :(")
+
+print(sd.generate())
+```
+![Generated image](images/notes_mermaid.png)
+
+</details>

@@ -55,6 +55,11 @@ class ReturnStep(Step):
 
 
 @dataclass
+class NoteStep(Step):
+    text: str
+
+
+@dataclass
 class SequenceDiagramParticipant:
     sequence_ref: "SequenceDiagram"
     title: str
@@ -139,6 +144,14 @@ class SequenceDiagram(BaseChart):
         participant = SequenceDiagramParticipant(title=title, sequence_ref=self)
         self.__participants.append(participant)
         return participant
+
+    def note(self, text: str) -> None:
+        """
+        Add the note plate with the iven text somewhere inside the diagram
+        :param text:
+        :return:
+        """
+        self.__add_step(NoteStep(text=text))
 
     @contextmanager
     def loop(self, how_many_iterations: str) -> None:

@@ -162,7 +162,7 @@ activate First
 First->>Second: Go to second
 activate Second
 rect rgb(51, 153, 102)
-note right of Second: Group enclosing interaction between second and third
+note right of Second: Group enclosing interaction<br/>between second and third
 Second->>Third: Go to third
 activate Third
 Third-->>Second: Return to second
@@ -187,7 +187,7 @@ end
 
         with sd.group("Group enclosing everything"):
             first.go_to(second, "Go to second")
-            with sd.group("Group enclosing interaction between second and third"):
+            with sd.group("Group enclosing interaction\nbetween second and third"):
                 second.go_to(third, "Go to third").return_to(second, "Return to second")
             second.return_to(first, "Return to first")
         assert sd.generate() == output
@@ -288,4 +288,40 @@ end
                     viewer.go_to(comedy, "Watch comedy")
                     with comedy.activate():
                         comedy.return_to(viewer, "Laugh a lot")
+        assert sd.generate() == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+            (
+                Mermaid,
+                """sequenceDiagram
+Title: Diagram Interaction and Notes
+participant Batman
+participant Bandit
+note right of Batman: Batman is throwing<br/>a batarang at the bandit
+activate Batman
+Batman->>Bandit: Pheeeeeeu!
+activate Bandit
+note right of Bandit: Batman has missed!
+Bandit-->>Batman: A bad day<br/>for the Gotham :(
+deactivate Bandit
+deactivate Batman
+""",
+            ),
+        ),
+    )
+    def test_note(self, generator_cls, output):
+        sd = SequenceDiagram(
+            "Diagram Interaction and Notes",
+            generator_cls,
+        )
+
+        batman = sd.participant("Batman")
+        bandit = sd.participant("Bandit")
+
+        sd.note("Batman is throwing\na batarang at the bandit")
+        batman.go_to(bandit, "Pheeeeeeu!")
+        sd.note("Batman has missed!")
+        sd.return_("A bad day\nfor the Gotham :(")
         assert sd.generate() == output
