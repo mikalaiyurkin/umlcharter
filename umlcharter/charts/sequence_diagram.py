@@ -86,7 +86,7 @@ class SequenceDiagramParticipant:
     def __hash__(self):
         return hash(self.title)
 
-    def __repr__(self):
+    def __str__(self):
         return f"Participant ({self.title})"
 
 
