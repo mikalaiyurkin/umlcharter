@@ -266,7 +266,7 @@ bandit = sd.participant("Bandit")
 sd.note("Batman is throwing\na batarang at the bandit")
 batman.go_to(bandit, "Pheeeeeeu!")
 sd.note("Batman has missed!")
-sd.return_("A bad day\nfor the Gotham :(")
+sd.return_("A bad day\nfor Gotham :(")
 
 print(sd.generate())
 ```
