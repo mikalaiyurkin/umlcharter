@@ -1,6 +1,9 @@
 # Sequence Diagrams
 
 ### Quick Start
+Every sequence diagram describes some behavioral scenario of interaction (message passing)
+between some prototypical actors.
+
 The simplest example to generate a very basic sequence diagram:
 ```python
 from umlcharter import SequenceDiagram, Mermaid
@@ -35,10 +38,9 @@ deactivate First
 which in turn can be rendered to this image:
 ![Generated image](images/basic.png)
 
-Simple, is not it? Now let's take a deeper look
+Simple, is not it? Now let's take a deeper look.
 
-Every sequence diagram describes some behavioral scenario of interaction between some actors.
-So to draw our beautiful diagram, we had to
+So, to draw our beautiful diagram, we had to first
 - choose the title
 - choose the DSL
 - and name the participants
@@ -55,7 +57,7 @@ first = sd.participant("First")
 second = sd.participant("Second")
 ```
 We have chosen the `"Basic Example"` to be our title, chosen mermaid as a DSL to generate the diagram as a code and
-defined 2 participants of the scenario  titled `"First"` and `"Second"`.
+defined two participants of the scenario  titled `"First"` and `"Second"`.
 
 Then we have defined the flow of interaction between the participants using 2 methods:
 - `go_to`
