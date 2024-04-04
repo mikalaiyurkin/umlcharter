@@ -1,5 +1,19 @@
 # Sequence Diagrams
 
+### Supported DSLs
+
+| Mermaid | PlantUML | ZenUML | SequenceDiagram.org | D2    |
+|---------|----------|--------|---------------------|-------|
+| ✅       | ✅        | 🚧  | 🚧              | 🚧 |
+
+For more details about the supported DSLs, please refer to the next links:
+- [Mermaid](https://mermaid.js.org/)
+- [PlantUML](https://plantuml.com/)
+- [ZenUML](https://zenuml.com/)
+- [SequenceDiagram.org](https://sequencediagram.org/instructions.html)
+- [D2](https://d2lang.com/tour/sequence-diagrams/)
+
+
 ### Quick Start
 Every sequence diagram describes some behavioral scenario of interaction (message passing)
 between some prototypical actors.
