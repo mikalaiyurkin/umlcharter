@@ -18,7 +18,13 @@ from umlcharter.charts.sequence_diagram import (
 class MermaidSequenceDiagram:
     @staticmethod
     def _line_break(string: str) -> str:
+        """Some places allow line break as <br/>"""
         return string.replace("\n", "<br/>")
+
+    @staticmethod
+    def _remove_line_breaks(string: str) -> str:
+        """Some places do not allow line breaks, replace these with just a plane space"""
+        return string.replace("\n", " ")
 
     @classmethod
     def generate(cls, sequence_diagram: SequenceDiagram) -> str:
@@ -27,9 +33,15 @@ class MermaidSequenceDiagram:
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: list[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
+        first_case = False
         last_targeted_participant: SequenceDiagramParticipant | None = None
         if participants:
             last_targeted_participant = participants[0]
+
+        aliases = {
+            participant: f"p{index + 1}"
+            for index, participant in enumerate(participants)
+        }
 
         # iterate over the color groups, so the groups are not overlapping and separately visible
         group_colors = itertools.cycle(
@@ -44,28 +56,31 @@ class MermaidSequenceDiagram:
             ]
         )
 
-        first_case = False
-
-        generated = f"sequenceDiagram\nTitle: {sequence_diagram.title}\n"
+        generated = f"sequenceDiagram\nTitle: {cls._remove_line_breaks(sequence_diagram.title)}\n"
         for participant in participants:
-            generated += f"participant {participant.title}\n"
+            generated += f"participant {aliases[participant]} as {cls._line_break(participant.title)}\n"
 
         for step in sequence:
             if isinstance(step, ParticipantActivationControl):
                 if step.is_active:
-                    generated += f"activate {step.participant.title}\n"
+                    generated += f"activate {aliases[step.participant]}\n"
                 else:
-                    generated += f"deactivate {step.participant.title}\n"
+                    generated += f"deactivate {aliases[step.participant]}\n"
 
-            if isinstance(step, NoteStep):
-                generated += f"note right of {last_targeted_participant.title}: {cls._line_break(step.text)}\n"
+            if isinstance(step, ForwardStep):
+                generated += f"{aliases[step.from_participant]}->>{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                last_targeted_participant = step.to_participant
+
+            if isinstance(step, ReturnStep):
+                generated += f"{aliases[step.from_participant]}-->>{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                last_targeted_participant = step.to_participant
 
             if isinstance(step, GroupControl):
                 # NB: the Mermaid does not have the native "group" as Plant UML does, for example,
                 # so the reasonable workaround would be here creation of the background rectangle + some note
                 if step.is_active:
                     generated += f"rect {next(group_colors)}\n"
-                    generated += f"note right of {last_targeted_participant.title}: {cls._line_break(step.text)}\n"
+                    generated += f"note right of {aliases[last_targeted_participant]}: {cls._line_break(step.text)}\n"
                 else:
                     generated += "end\n"
 
@@ -90,11 +105,7 @@ class MermaidSequenceDiagram:
                     else:
                         generated += f"else {cls._line_break(step.text)}\n"
 
-            if isinstance(step, ForwardStep):
-                generated += f"{step.from_participant.title}->>{step.to_participant.title}: {cls._line_break(step.text)}\n"
-                last_targeted_participant = step.to_participant
-
-            if isinstance(step, ReturnStep):
-                generated += f"{step.from_participant.title}-->>{step.to_participant.title}: {cls._line_break(step.text)}\n"
+            if isinstance(step, NoteStep):
+                generated += f"note right of {aliases[last_targeted_participant]}: {cls._line_break(step.text)}\n"
 
         return generated
