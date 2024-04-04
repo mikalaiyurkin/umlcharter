@@ -76,15 +76,14 @@ defined two participants of the scenario  titled `"First"` and `"Second"`.
 Then we have defined the flow of interaction between the participants using 2 methods:
 - `go_to`
 - `return_to`
-These two methods defines the direction of the activity.
 
-In our example
+These two methods define the direction of the activity. In our example
 ```python
 first.go_to(second, "Do something sketchy")
 second.return_to(first, "A result")
 ```
 method `go_to` is used to indicate that the participant `"First"` interacts somehow with `"Second"`,
-and the flow now is under control of the participant `"Second"`
+and the flow now is under control of the participant `"Second"`.
 In turn, the `return_to` used to return the control back to the first participant.
 
 ### Auto-activation
@@ -110,8 +109,8 @@ to keep this feature ON by default
 unless you want for some reason a granular control over the activation of the participants._ 
 
 When the auto-activation is ON,
-the sequence diagram will track the sequence of actions
-you have defined and automatically mark the participant that is expected to be controlling the flow as "active".
+the sequence diagram will track the sequence of actions that
+you have defined, and automatically will mark the participant expected to be controlling the flow as "active".
 In such configuration,
 it is expected to always return control back to the participant activated the flow earlier;
 so instead of the method `return_to` called from participant,
@@ -213,7 +212,8 @@ for dsl in (Mermaid, PlantUML):
 
 <details>
 <summary><h3>Group actions</h3></summary>
-Certain actions in the flow can be grouped to visually amplify the 
+
+Certain actions in the flow can be grouped to visually highlight the 
 logical relations between the actions.
 
 To do that you have to use the context manager `group` called from the diagram instance
@@ -244,7 +244,8 @@ for dsl in (Mermaid, PlantUML):
 
 <details>
 <summary><h3>Actions in loop</h3></summary>
-Certain actions in the flow can be grouped to visually note these are happening inside a loop.
+
+Certain actions in the flow can be grouped to visually highlight these are happening inside a loop.
 
 To identify the group of actions running in a loop, you can use context manager `loop`:
 
@@ -274,8 +275,9 @@ for dsl in (Mermaid, PlantUML):
 
 <details>
 <summary><h3>Conditional actions</h3></summary>
+
 Certain actions in the flow can be grouped
-to visually identify that these are executed in case of the specific condition being met.
+to visually highlight these are executed in case of the specific condition being met.
 
 To identify the group of actions running if the condition has been met,
 you can use context manager `condition`
@@ -319,7 +321,8 @@ for dsl in (Mermaid, PlantUML):
 
 <details>
 <summary><h3>Custom notes</h3></summary>
-It is possible to add the plates with the custom notes to the diagram.
+
+It is possible to add the plates with the custom text to the diagram.
 
 To place the plate with the text, you can use the method `note`.
 These custom notes will be added to the last activated participant in the flow.
