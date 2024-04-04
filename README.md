@@ -9,4 +9,4 @@ in the popular DSLs (PlantUML, Mermaid, D2, etc) using simple python constructio
 
 For the examples of how this package can be used and the list of exactly supported DSLs, 
 please check the documentation:
-- [Sequence Diagrams](docs/sequence_diagram/README.md)
+- [Sequence Diagrams](https://github.com/mikalaiyurkin/umlcharter/blob/master/docs/sequence_diagram/README.md)
