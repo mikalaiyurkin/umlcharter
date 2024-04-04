@@ -266,7 +266,7 @@ group Group enclosing everything
 activate p1
 p1->p2: Go to second
 activate p2
-group Group enclosing interaction\nbetween second and third
+group Group enclosing interaction\\nbetween second and third
 p2->p3: Go to third
 activate p3
 p3-->p2: Return to second
