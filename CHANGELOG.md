@@ -1,7 +1,12 @@
+### [0.0.4] - TBD
+
+- Add method `note` for the note generation inside the sequence diagram
+- Added PlantUML support
+
 ### [0.0.3] - 2023.04.02
 
 - Add the documentation with the examples for the sequence diagram. 
-- Add the tests for the CI and the check for the supported versions 
+- Add the tests for the CI and a check for the supported python versions 
 
 ### [0.0.2] - 2023.04.02
 
