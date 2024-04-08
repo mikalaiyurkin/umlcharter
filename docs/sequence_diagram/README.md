@@ -4,7 +4,7 @@
 
 | Mermaid | PlantUML | D2 | SequenceDiagram.org | ZenUML |
 |---------|----------|----|---------------------|--------|
-| ✅       | ✅        | 🚧 | 🚧                  | 🚧     |
+| ✅       | ✅        | ✅  | 🚧                  | 🚧     |
 
 For more details about the supported DSLs, please refer to the next links:
 - [Mermaid](https://mermaid.js.org/)
@@ -86,6 +86,14 @@ method `go_to` is used to indicate that the participant `"First"` interacts some
 and the flow now is under control of the participant `"Second"`.
 In turn, the `return_to` used to return the control back to the first participant.
 
+Also,
+the result of these calls indicating the activity 
+of the participant is the participant was targeted in the action, so you can chain the lines from above as this:
+```python
+first.go_to(second, "Do something sketchy").return_to(first, "A result")
+```
+with the same results.
+
 ### Auto-activation
 
 In the sequence diagram, it is quite a common thing to have the concept of the "active"
@@ -143,9 +151,9 @@ In the worst scenario any piece of code related to the activation of the partici
 
 A more complex example involving multiple participants using various DSLs:
 ```python
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, D2):
     sd = SequenceDiagram("Complex\nExample", dsl)
     first = sd.participant("First\nParticipant")
     second = sd.participant("Second\nParticipant")
@@ -173,9 +181,12 @@ for dsl in (Mermaid, PlantUML):
     )
     print(sd)
 ```
-| Mermaid                              | PlantUML                              |
-|--------------------------------------|---------------------------------------|
-| ![image](images/complex_mermaid.png) | ![image](images/complex_plantuml.png) |
+| DSL      |             Visualization              |
+|----------|:--------------------------------------:|
+| Mermaid  |  ![image](images/complex_mermaid.png)  |
+| PlantUML | ![image](images/complex_plantuml.png)  |
+| D2       |    ![image](images/complex_d2.png)     |
+
 
 For more specific examples and extended functionality, please refer to the rest of the document:
 
@@ -185,9 +196,9 @@ For more specific examples and extended functionality, please refer to the rest 
 It is possible to control the activation of the participant manually using the `activate` context manager:
 
 ```python
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, D2):
     sd = SequenceDiagram(
         "Manual Activation",
         dsl,
@@ -204,10 +215,11 @@ for dsl in (Mermaid, PlantUML):
     
     print(sd)
 ```
-| Mermaid                                        | PlantUML                                        |
-|------------------------------------------------|-------------------------------------------------|
-| ![image](images/manual_activation_mermaid.png) | ![image](images/manual_activation_plantuml.png) |
-
+| DSL      |                  Visualization                  |
+|----------|:-----------------------------------------------:|
+| Mermaid  | ![image](images/manual_activation_mermaid.png)  |
+| PlantUML | ![image](images/manual_activation_plantuml.png) |
+| D2       |    ![image](images/manual_activation_d2.png)    |
 </details>
 
 <details>
@@ -219,9 +231,9 @@ logical relations between the actions.
 To do that you have to use the context manager `group` called from the diagram instance
 
 ```python
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, D2):
     sd = SequenceDiagram("Grouping", dsl)
     
     first = sd.participant("First")
@@ -236,10 +248,11 @@ for dsl in (Mermaid, PlantUML):
     
     print(sd)
 ```
-| Mermaid                               | PlantUML                               |
-|---------------------------------------|----------------------------------------|
-| ![image](images/grouping_mermaid.png) | ![image](images/grouping_plantuml.png) |
-
+| DSL      |                                                                        Visualization                                                                        |
+|----------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  | **NB!** Mermaid does not have a native "group" entity<br/>So the "group" is simulated using the colored rectangle<br/>![image](images/grouping_mermaid.png) |
+| PlantUML |                                                           ![image](images/grouping_plantuml.png)                                                            |
+| D2       |                                                              ![image](images/grouping_d2.png)                                                               |
 </details>
 
 <details>
@@ -250,9 +263,9 @@ Certain actions in the flow can be grouped to visually highlight these are happe
 To identify the group of actions running in a loop, you can use context manager `loop`:
 
 ```python
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, D2):
     sd = SequenceDiagram("Loops", dsl)
     
     first = sd.participant("First")
@@ -266,11 +279,11 @@ for dsl in (Mermaid, PlantUML):
     
     print(sd)
 ```
-
-| Mermaid                           | PlantUML                           |
-|-----------------------------------|------------------------------------|
-| ![image](images/loop_mermaid.png) | ![image](images/loop_plantuml.png) |
-
+| DSL      |                                                                             Visualization                                                                              |
+|----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  |                                                                   ![image](images/loop_mermaid.png)                                                                    |
+| PlantUML |                                                                   ![image](images/loop_plantuml.png)                                                                   |
+| D2       | **NB!** D2 does not have a native "loop" entity<br/>So the "loop" is simulated using the custom styling applied to the "group" entity<br/>![image](images/loop_d2.png) |
 </details>
 
 <details>
@@ -286,9 +299,9 @@ that runs under the condition and the context manager `case` to specifically nam
 
 ##### Mermaid
 ```python
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, D2):
     sd = SequenceDiagram("Conditions", dsl, auto_activation=False)
     
     viewer = sd.participant("Viewer")
@@ -312,11 +325,11 @@ for dsl in (Mermaid, PlantUML):
     
     print(sd)
 ```
-| Mermaid                                 | PlantUML                                |
-|-----------------------------------------|-----------------------------------------|
-| ![image](images/condition_mermaid.png)  | ![image](images/condition_plantuml.png) |
-
-
+| DSL      |                                                                               Visualization                                                                               |
+|----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  |                                                                  ![image](images/condition_mermaid.png)                                                                   |
+| PlantUML |                                                                  ![image](images/condition_plantuml.png)                                                                  |
+| D2       | **NB!** D2 does not have a native "alt" entity<br/>So the "alt" is simulated using the custom styling applied to the "group" entity<br/>![image](images/condition_d2.png) |
 </details>
 
 <details>
@@ -330,9 +343,9 @@ If there is no active participant right now, the first participant will be used.
 
 ##### Mermaid
 ```python
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, D2):
     sd = SequenceDiagram("Notes", dsl)
     
     batman = sd.participant("Batman")
@@ -345,8 +358,9 @@ for dsl in (Mermaid, PlantUML):
     
     print(sd)
 ```
-| Mermaid                            | PlantUML                            |
-|------------------------------------|-------------------------------------|
-| ![image](images/notes_mermaid.png) | ![image](images/notes_plantuml.png) |
-
+| DSL      |            Visualization            |
+|----------|:-----------------------------------:|
+| Mermaid  | ![image](images/notes_mermaid.png)  |
+| PlantUML | ![image](images/notes_plantuml.png) |
+| D2       |    ![image](images/notes_d2.png)    |
 </details>
