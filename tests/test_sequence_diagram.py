@@ -1,6 +1,6 @@
 import pytest
 
-from umlcharter import SequenceDiagram, Mermaid, PlantUML
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
 
 
 class TestSequenceDiagram:
@@ -20,6 +20,13 @@ title: Diagram Empty
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Empty {
+shape: sequence_diagram
+}
+"""
+            )
         ),
     )
     def test_no_participants(self, generator_cls, output):
@@ -46,6 +53,15 @@ participant "Second" as p2
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Only Participants {
+shape: sequence_diagram
+p1: First
+p2: Second
+}
+"""
+            )
         ),
     )
     def test_only_participants(self, generator_cls, output):
@@ -152,6 +168,45 @@ p3-->p1: Return to first
 @enduml
 """,
             ),
+            (
+                D2,
+                True,
+                """title: Diagram Interaction\\nand Auto Activation {
+shape: sequence_diagram
+p1: First\\nParticipant
+p2: Second\\nParticipant
+p3: Third\\nParticipant
+p4: Fourth\\nParticipant
+p1.0 -> p2.1: Go to second
+p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
+p1.2 -> p3.3: Go to third
+p3.3 -> p4.4: Go to fourth
+p4.4 -> p4.4: Go to self
+p4.4 -> p3.3: Return to third {style.stroke-dash: 3}
+p3.3 -> p1.2: Return to first {style.stroke-dash: 3}
+}
+"""
+            ),
+            (
+                D2,
+                False,
+                """title: Diagram Interaction\\nand Auto Activation {
+shape: sequence_diagram
+p1: First\\nParticipant
+p2: Second\\nParticipant
+p3: Third\\nParticipant
+p4: Fourth\\nParticipant
+p1 -> p2: Go to second
+p2 -> p1: Return to first {style.stroke-dash: 3}
+p1 -> p3: Go to third
+p3 -> p4: Go to fourth
+p4 -> p4: Go to self
+p4 -> p3: Return to third {style.stroke-dash: 3}
+p3 -> p1: Return to first {style.stroke-dash: 3}
+}
+"""
+            )
+
         ),
     )
     def test_simple_interaction_and_auto_activation(
@@ -208,6 +263,18 @@ deactivate p1
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Interaction and Manual Activation {
+shape: sequence_diagram
+p1: First
+p2: Second
+p1.0 -> p2.1: Go to second
+p2.1 -> p2.1: Go to self
+p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
+}
+"""
+            )
         ),
     )
     def test_simple_interaction_and_manual_activation(self, generator_cls, output):
@@ -279,6 +346,24 @@ end
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Interaction and Grouping {
+shape: sequence_diagram
+p1: First
+p2: Second
+p3: Third
+Group enclosing everything: {
+p1.0 -> p2.1: Go to second
+Group enclosing interaction\\nbetween second and third: {
+p2.1 -> p3.2: Go to third
+p3.2 -> p2.1: Return to second {style.stroke-dash: 3}
+}
+p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
+}
+}
+"""
+            )
         ),
     )
     def test_grouping(self, generator_cls, output):
@@ -339,6 +424,30 @@ end
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Interaction and Loops {
+shape: sequence_diagram
+p1: First
+p2: Second
+LOOP Infinite loop: {
+style: {
+border-radius: 50
+fill: "#ffdfbf"
+}
+p1.0 -> p2.1: Send request to second
+LOOP Repeat\\nuntil available: {
+style: {
+border-radius: 50
+fill: "#ffdfbf"
+}
+p2.1 -> p2.1: Check internal state
+}
+p2.1 -> p1.0: Return response {style.stroke-dash: 3}
+}
+}
+"""
+            )
         ),
     )
     def test_loop(self, generator_cls, output):
@@ -417,6 +526,36 @@ end
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Interaction and Conditions {
+shape: sequence_diagram
+p1: Viewer
+p2: Drama
+p3: Comedy
+p1.0 -> p1.0: What would I like to watch today?
+alt1: ALT {
+style: {
+fill: "#ffdfbf"
+}
+CASE Want a drama: {
+style: {
+fill: "#f6c5c2"
+}
+p1.1 -> p2.2: Watch drama
+p2.2 -> p1.1: Tears and sadness {style.stroke-dash: 3}
+}
+CASE Want a comedy: {
+style: {
+fill: "#f6c5c2"
+}
+p1.3 -> p3.4: Watch comedy
+p3.4 -> p1.3: Laugh a lot {style.stroke-dash: 3}
+}
+}
+}
+"""
+            )
         ),
     )
     def test_condition(self, generator_cls, output):
@@ -483,6 +622,20 @@ note right of p1: Batman is sad now
 @enduml
 """,
             ),
+            (
+                D2,
+                """title: Diagram Interaction and Notes {
+shape: sequence_diagram
+p1: Batman
+p2: Bandit
+p1."Batman is throwing\\na batarang at the bandit"
+p1.0 -> p2.1: Pheeeeeeu!
+p2.1."Batman has missed!"
+p2.1 -> p1.0: A bad day\\nfor the Gotham :( {style.stroke-dash: 3}
+p1."Batman is sad now"
+}
+"""
+            )
         ),
     )
     def test_note(self, generator_cls, output):
@@ -499,5 +652,4 @@ note right of p1: Batman is sad now
         sd.note("Batman has missed!")
         sd.return_("A bad day\nfor the Gotham :(")
         sd.note("Batman is sad now")
-        print(sd)
         assert str(sd) == output

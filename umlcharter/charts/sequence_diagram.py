@@ -303,5 +303,8 @@ class SequenceDiagram(BaseChart):
     def generate(self) -> str:
         return self.__generator.generate_sequence_diagram()
 
+    def __repr__(self):
+        return f"'{self.title}', {self.generator_cls.__name__}"
+
     def __str__(self):
         return self.generate()
