@@ -1,4 +1,8 @@
-### [0.0.4] - TBD
+### [0.0.5] - 2023.04.08
+
+- Added D2 support for sequence diagram
+
+### [0.0.4] - 2023.04.04
 
 - Add method `note` for the note generation inside the sequence diagram
 - Added PlantUML support
