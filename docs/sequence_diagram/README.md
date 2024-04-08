@@ -145,10 +145,6 @@ sd.return_("A result")
 print(sd)
 ```
 ![image](images/auto_activation.png)
-
-_**NB**_: it is not guaranteed that _any_ DSL supported by the `umlcharter` allows a granular tuning and control over the activation.
-In the worst scenario any piece of code related to the activation of the participants will be just ignored.
-
 A more complex example involving multiple participants using various DSLs:
 ```python
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
