@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
@@ -698,3 +700,42 @@ p2.1 -> p1.0: '' {style.stroke-dash: 3}
 
         first.go_to(second).return_to(first)
         assert str(sd) == output
+
+    def test_same_participants(self):
+        sd = SequenceDiagram("Same participants", Mock)
+
+        sd.participant("Same")
+        with pytest.raises(AssertionError):
+            sd.participant("Same")  # it is forbidden to have multiple participants with the same label
+
+    def test_forbid_return_when_not_auto_activated(self):
+        sd = SequenceDiagram("Return without auto-activation", Mock, auto_activation=False)
+
+        first = sd.participant("First")
+        second = sd.participant("Second")
+
+        first.go_to(second)
+        with pytest.raises(AssertionError):
+            sd.return_()
+
+    def test_forbid_return_to_nowhere(self):
+        sd = SequenceDiagram("Return to nowhere", Mock)
+
+        with pytest.raises(AssertionError):
+            sd.return_()
+
+    def test_force_case_after_condition(self):
+        sd = SequenceDiagram("Violated order of condition and case #1", Mock)
+        first = sd.participant("First")
+        second = sd.participant("Second")
+
+        with pytest.raises(AssertionError):
+            with sd.condition():
+                first.go_to(second, "Do smth")
+
+    def test_force_case_inside_condition(self):
+        sd = SequenceDiagram("Violated order of condition and case #2", Mock)
+
+        with pytest.raises(AssertionError):
+            with sd.case("A case"):
+                pass

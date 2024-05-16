@@ -14,4 +14,4 @@ class IChartGenerator(ABC):
         self.ref = ref
 
     def generate_sequence_diagram(self) -> str:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: nocover

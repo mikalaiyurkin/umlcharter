@@ -94,8 +94,8 @@ class SequenceDiagramParticipant:
     def __hash__(self):
         return hash(self.title)
 
-    def __str__(self):
-        return f"Participant ({self.title})"
+    def __repr__(self):
+        return f"Participant ({self.title})"  # pragma: nocover
 
 
 @dataclass
@@ -304,7 +304,7 @@ class SequenceDiagram(BaseChart):
         return self.__generator.generate_sequence_diagram()
 
     def __repr__(self):
-        return f"'{self.title}', {self.generator_cls.__name__}"
+        return f"'{self.title}', {self.generator_cls.__name__}"  # pragma: nocover
 
     def __str__(self):
         return self.generate()
