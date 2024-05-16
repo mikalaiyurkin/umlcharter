@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
@@ -653,3 +655,87 @@ p1."Batman is sad now"
         sd.return_("A bad day\nfor the Gotham :(")
         sd.note("Batman is sad now")
         assert str(sd) == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+                (Mermaid,
+                 """sequenceDiagram
+Title: Empty Transitions between Participants
+participant p1 as First
+participant p2 as Second
+activate p1
+p1->>p2: 
+activate p2
+p2-->>p1: 
+deactivate p2
+deactivate p1
+"""),
+                (PlantUML, """@startuml
+title: Empty Transitions between Participants
+participant "First" as p1
+participant "Second" as p2
+activate p1
+p1->p2: 
+activate p2
+p2-->p1: 
+deactivate p2
+deactivate p1
+@enduml
+"""),
+                (D2, """title: Empty Transitions between Participants {
+shape: sequence_diagram
+p1: First
+p2: Second
+p1.0 -> p2.1: ''
+p2.1 -> p1.0: '' {style.stroke-dash: 3}
+}
+"""),
+        )
+    )
+    def test_empty_transitions(self, generator_cls, output):
+        sd = SequenceDiagram("Empty Transitions between Participants", generator_cls)
+        first = sd.participant("First")
+        second = sd.participant("Second")
+
+        first.go_to(second).return_to(first)
+        assert str(sd) == output
+
+    def test_same_participants(self):
+        sd = SequenceDiagram("Same participants", Mock)
+
+        sd.participant("Same")
+        with pytest.raises(AssertionError):
+            sd.participant("Same")  # it is forbidden to have multiple participants with the same label
+
+    def test_forbid_return_when_not_auto_activated(self):
+        sd = SequenceDiagram("Return without auto-activation", Mock, auto_activation=False)
+
+        first = sd.participant("First")
+        second = sd.participant("Second")
+
+        first.go_to(second)
+        with pytest.raises(AssertionError):
+            sd.return_()
+
+    def test_forbid_return_to_nowhere(self):
+        sd = SequenceDiagram("Return to nowhere", Mock)
+
+        with pytest.raises(AssertionError):
+            sd.return_()
+
+    def test_force_case_after_condition(self):
+        sd = SequenceDiagram("Violated order of condition and case #1", Mock)
+        first = sd.participant("First")
+        second = sd.participant("Second")
+
+        with pytest.raises(AssertionError):
+            with sd.condition():
+                first.go_to(second, "Do smth")
+
+    def test_force_case_inside_condition(self):
+        sd = SequenceDiagram("Violated order of condition and case #2", Mock)
+
+        with pytest.raises(AssertionError):
+            with sd.case("A case"):
+                pass

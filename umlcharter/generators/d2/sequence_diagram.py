@@ -12,11 +12,12 @@ from umlcharter.charts.sequence_diagram import (
     NoteStep,
 )
 
+
 class D2SequenceDiagram:
     @staticmethod
     def _line_break(string: str) -> str:
         """Some places allow line break as \n"""
-        return string.replace("\n", "\\n")
+        return string.replace("\n", "\\n") or "''"
 
     @classmethod
     def generate(cls, sequence_diagram: SequenceDiagram) -> str:
