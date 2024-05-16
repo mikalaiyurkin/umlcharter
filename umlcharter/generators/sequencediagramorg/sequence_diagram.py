@@ -14,7 +14,6 @@ from umlcharter.charts.sequence_diagram import (
 
 
 class SequenceDiagramOrgSequenceDiagram:
-
     @staticmethod
     def _line_break(string: str) -> str:
         """Some places allow line break as \n"""
@@ -69,7 +68,9 @@ class SequenceDiagramOrgSequenceDiagram:
 
             if isinstance(step, LoopControl):
                 if step.is_active:
-                    generated += f"loop {cls._remove_line_breaks(step.how_many_iterations)}\n"
+                    generated += (
+                        f"loop {cls._remove_line_breaks(step.how_many_iterations)}\n"
+                    )
                 else:
                     generated += "end\n"
 

@@ -37,7 +37,9 @@ class D2SequenceDiagram:
 
         generated = f"title: {cls._line_break(sequence_diagram.title)} {{\nshape: sequence_diagram\n"
         for participant in participants:
-            generated += f'{aliases[participant]}: {cls._line_break(participant.title)}\n'
+            generated += (
+                f"{aliases[participant]}: {cls._line_break(participant.title)}\n"
+            )
 
         # NB! In D2 the logic of "activation" phases or "spans" works a bit differently, compared to the other DSLs.
         # You have to know that the participant will be activated
@@ -50,24 +52,25 @@ class D2SequenceDiagram:
         len_sequence = len(new_seq)
         for index, step in enumerate(new_seq):
             if (
-                isinstance(step, ForwardStep) and
-                (index + 1) < len_sequence and
-                isinstance(new_seq[index + 1], ParticipantActivationControl) and
-                new_seq[index + 1].is_active is True and
-                step.to_participant is new_seq[index + 1].participant
+                isinstance(step, ForwardStep)
+                and (index + 1) < len_sequence
+                and isinstance(new_seq[index + 1], ParticipantActivationControl)
+                and new_seq[index + 1].is_active is True
+                and step.to_participant is new_seq[index + 1].participant
             ):
                 new_seq[index], new_seq[index + 1] = new_seq[index + 1], new_seq[index]
 
         activation_counter = 0
         alt_counter = 1
         for step in new_seq:
-
             if isinstance(step, ParticipantActivationControl):
                 if step.is_active:
                     aliases[step.participant] += f".{activation_counter}"
                     activation_counter += 1
                 else:
-                    aliases[step.participant] = ".".join(aliases[step.participant].split(".")[:-1])
+                    aliases[step.participant] = ".".join(
+                        aliases[step.participant].split(".")[:-1]
+                    )
 
             if isinstance(step, ForwardStep):
                 generated += f"{aliases[step.from_participant]} -> {aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
@@ -91,7 +94,9 @@ class D2SequenceDiagram:
 
             if isinstance(step, ConditionControl):
                 if step.is_active:
-                    generated += f'alt{alt_counter}: ALT {{\nstyle: {{\nfill: "#ffdfbf"\n}}\n'
+                    generated += (
+                        f'alt{alt_counter}: ALT {{\nstyle: {{\nfill: "#ffdfbf"\n}}\n'
+                    )
                     alt_counter += 1
                 else:
                     generated += "}\n"
