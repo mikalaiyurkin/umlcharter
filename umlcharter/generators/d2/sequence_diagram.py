@@ -26,10 +26,6 @@ class D2SequenceDiagram:
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: list[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
-        first_case = False
-        deactivation_just_has_happened_for_step: SequenceDiagramParticipant | None = (
-            None
-        )
         last_targeted_participant: SequenceDiagramParticipant | None = None
         if participants:
             last_targeted_participant = participants[0]
