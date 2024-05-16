@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOrg
 
 
 class TestSequenceDiagram:
@@ -27,8 +27,13 @@ title: Diagram Empty
                 """title: Diagram Empty {
 shape: sequence_diagram
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Empty
+""",
+            ),
         ),
     )
     def test_no_participants(self, generator_cls, output):
@@ -62,8 +67,15 @@ shape: sequence_diagram
 p1: First
 p2: Second
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Only Participants
+participant "First" as p1
+participant "Second" as p2
+""",
+            ),
         ),
     )
     def test_only_participants(self, generator_cls, output):
@@ -187,7 +199,7 @@ p4.4 -> p4.4: Go to self
 p4.4 -> p3.3: Return to third {style.stroke-dash: 3}
 p3.3 -> p1.2: Return to first {style.stroke-dash: 3}
 }
-"""
+""",
             ),
             (
                 D2,
@@ -206,9 +218,52 @@ p4 -> p4: Go to self
 p4 -> p3: Return to third {style.stroke-dash: 3}
 p3 -> p1: Return to first {style.stroke-dash: 3}
 }
-"""
-            )
-
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                True,
+                """title Diagram Interaction\\nand Auto Activation
+participant "First\\nParticipant" as p1
+participant "Second\\nParticipant" as p2
+participant "Third\\nParticipant" as p3
+participant "Fourth\\nParticipant" as p4
+activate p1
+p1->p2: Go to second
+activate p2
+p2-->p1: Return to first
+deactivate p2
+deactivate p1
+activate p1
+p1->p3: Go to third
+activate p3
+p3->p4: Go to fourth
+activate p4
+p4->p4: Go to self
+p4-->p3: Return to third
+deactivate p4
+p3-->p1: Return to first
+deactivate p3
+deactivate p1
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                False,
+                """title Diagram Interaction\\nand Auto Activation
+participant "First\\nParticipant" as p1
+participant "Second\\nParticipant" as p2
+participant "Third\\nParticipant" as p3
+participant "Fourth\\nParticipant" as p4
+p1->p2: Go to second
+p2-->p1: Return to first
+p1->p3: Go to third
+p3->p4: Go to fourth
+p4->p4: Go to self
+p4-->p3: Return to third
+p3-->p1: Return to first
+""",
+            ),
         ),
     )
     def test_simple_interaction_and_auto_activation(
@@ -275,8 +330,22 @@ p1.0 -> p2.1: Go to second
 p2.1 -> p2.1: Go to self
 p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Interaction and Manual Activation
+participant "First" as p1
+participant "Second" as p2
+activate p1
+p1->p2: Go to second
+activate p2
+p2->p2: Go to self
+p2-->p1: Return to first
+deactivate p2
+deactivate p1
+""",
+            ),
         ),
     )
     def test_simple_interaction_and_manual_activation(self, generator_cls, output):
@@ -364,8 +433,30 @@ p3.2 -> p2.1: Return to second {style.stroke-dash: 3}
 p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
 }
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Interaction and Grouping
+participant "First" as p1
+participant "Second" as p2
+participant "Third" as p3
+group [Group enclosing everything]
+activate p1
+p1->p2: Go to second
+activate p2
+group [Group enclosing interaction between second and third]
+p2->p3: Go to third
+activate p3
+p3-->p2: Return to second
+deactivate p3
+end
+p2-->p1: Return to first
+deactivate p2
+deactivate p1
+end
+""",
+            ),
         ),
     )
     def test_grouping(self, generator_cls, output):
@@ -448,8 +539,26 @@ p2.1 -> p2.1: Check internal state
 p2.1 -> p1.0: Return response {style.stroke-dash: 3}
 }
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Interaction and Loops
+participant "First" as p1
+participant "Second" as p2
+loop Infinite loop
+activate p1
+p1->p2: Send request to second
+activate p2
+loop Repeat until available
+p2->p2: Check internal state
+end
+p2-->p1: Return response
+deactivate p2
+deactivate p1
+end
+""",
+            ),
         ),
     )
     def test_loop(self, generator_cls, output):
@@ -556,8 +665,34 @@ p3.4 -> p1.3: Laugh a lot {style.stroke-dash: 3}
 }
 }
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Interaction and Conditions
+participant "Viewer" as p1
+participant "Drama" as p2
+participant "Comedy" as p3
+activate p1
+p1->p1: What would I like to watch today?
+deactivate p1
+alt Want a drama
+activate p1
+p1->p2: Watch drama
+activate p2
+p2-->p1: Tears and sadness
+deactivate p2
+deactivate p1
+else Want a comedy
+activate p1
+p1->p3: Watch comedy
+activate p3
+p3-->p1: Laugh a lot
+deactivate p3
+deactivate p1
+end
+""",
+            ),
         ),
     )
     def test_condition(self, generator_cls, output):
@@ -636,8 +771,24 @@ p2.1."Batman has missed!"
 p2.1 -> p1.0: A bad day\\nfor the Gotham :( {style.stroke-dash: 3}
 p1."Batman is sad now"
 }
-"""
-            )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Interaction and Notes
+participant "Batman" as p1
+participant "Bandit" as p2
+note right of p1: Batman is throwing\\na batarang at the bandit
+activate p1
+p1->p2: Pheeeeeeu!
+activate p2
+note right of p2: Batman has missed!
+p2-->p1: A bad day\\nfor the Gotham :(
+deactivate p2
+deactivate p1
+note right of p1: Batman is sad now
+""",
+            ),
         ),
     )
     def test_note(self, generator_cls, output):
@@ -659,8 +810,9 @@ p1."Batman is sad now"
     @pytest.mark.parametrize(
         "generator_cls,output",
         (
-                (Mermaid,
-                 """sequenceDiagram
+            (
+                Mermaid,
+                """sequenceDiagram
 Title: Empty Transitions between Participants
 participant p1 as First
 participant p2 as Second
@@ -670,8 +822,11 @@ activate p2
 p2-->>p1: 
 deactivate p2
 deactivate p1
-"""),
-                (PlantUML, """@startuml
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
 title: Empty Transitions between Participants
 participant "First" as p1
 participant "Second" as p2
@@ -682,16 +837,33 @@ p2-->p1:
 deactivate p2
 deactivate p1
 @enduml
-"""),
-                (D2, """title: Empty Transitions between Participants {
+""",
+            ),
+            (
+                D2,
+                """title: Empty Transitions between Participants {
 shape: sequence_diagram
 p1: First
 p2: Second
 p1.0 -> p2.1: ''
 p2.1 -> p1.0: '' {style.stroke-dash: 3}
 }
-"""),
-        )
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Empty Transitions between Participants
+participant "First" as p1
+participant "Second" as p2
+activate p1
+p1->p2: 
+activate p2
+p2-->p1: 
+deactivate p2
+deactivate p1
+""",
+            ),
+        ),
     )
     def test_empty_transitions(self, generator_cls, output):
         sd = SequenceDiagram("Empty Transitions between Participants", generator_cls)
@@ -706,10 +878,14 @@ p2.1 -> p1.0: '' {style.stroke-dash: 3}
 
         sd.participant("Same")
         with pytest.raises(AssertionError):
-            sd.participant("Same")  # it is forbidden to have multiple participants with the same label
+            sd.participant(
+                "Same"
+            )  # it is forbidden to have multiple participants with the same label
 
     def test_forbid_return_when_not_auto_activated(self):
-        sd = SequenceDiagram("Return without auto-activation", Mock, auto_activation=False)
+        sd = SequenceDiagram(
+            "Return without auto-activation", Mock, auto_activation=False
+        )
 
         first = sd.participant("First")
         second = sd.participant("Second")
