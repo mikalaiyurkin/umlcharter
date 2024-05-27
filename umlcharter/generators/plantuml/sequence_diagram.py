@@ -39,9 +39,17 @@ class PlantUMLSequenceDiagram:
             for index, participant in enumerate(participants)
         }
 
+        participant_types_map = {
+            "default": "participant",
+            "actor": "actor",
+            "boundary": "boundary",
+            "control": "control",
+            "entity": "entity",
+        }
+
         generated = f"@startuml\ntitle: {cls._line_break(sequence_diagram.title)}\n"
         for participant in participants:
-            generated += f'participant "{cls._line_break(participant.title)}" as {aliases[participant]}\n'
+            generated += f'{participant_types_map[participant.type_]} "{cls._line_break(participant.title)}" as {aliases[participant]}\n'
 
         for step in sequence:
             if isinstance(step, ParticipantActivationControl):

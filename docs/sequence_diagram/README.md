@@ -2,16 +2,15 @@
 
 ### Supported DSLs
 
-| Mermaid | PlantUML | D2 | SequenceDiagram.org | ZenUML |
-|---------|----------|----|---------------------|--------|
-| ✅       | ✅        | ✅  | ✅                   | 🚧     |
+| Mermaid | PlantUML | D2 | SequenceDiagram.org |
+|---------|----------|----|---------------------|
+| ✅       | ✅        | ✅  | ✅                   |
 
 For more details about the supported DSLs, please refer to the next links:
 - [Mermaid](https://mermaid.js.org/)
 - [PlantUML](https://plantuml.com/)
 - [D2](https://d2lang.com/tour/sequence-diagrams/)
 - [SequenceDiagram.org](https://sequencediagram.org/instructions.html)
-- [ZenUML](https://zenuml.com/)
 
 
 ### Quick Start
@@ -363,4 +362,41 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 | PlantUML            |      ![image](images/notes_plantuml.png)      |
 | D2                  |         ![image](images/notes_d2.png)         |
 | SequenceDiagram.org | ![image](images/notes_sequencediagramorg.png) |
+</details>
+
+<details>
+<summary><h3>ECB stereotypes for the participants</h3></summary>
+
+It is possible to define the alternative graphical stereotypes for the participants, 
+as from the [robustness diagram](https://en.wikipedia.org/wiki/Entity-control-boundary#Robustness_diagram) 
+
+To mark the participant as "actor", "boundary", "control" or "entity", the special calls must be used accordingly:
+`as_actor()`, `as_boundary()`, `as_control` and `as_entity()`.
+
+Also, if these custom types are in use,
+the possibility to interact is limited according to the given type of the participant.
+For example, "actor" cannot interact directly with "entity" and vice versa. 
+You can mix the participant defined in ECB with the participants without any specified types freely.
+The limitations of interaction between the participants are applied **only** to the participants with the explicitly set ECB type. 
+```python
+from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOrg
+
+for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
+    sd = SequenceDiagram("Participant types, according to ECB", dsl)
+    actor = sd.participant("Actor").as_actor()
+    boundary = sd.participant("Boundary").as_boundary()
+    control = sd.participant("Control").as_control()
+    entity = sd.participant("Entity").as_entity()
+
+    actor.go_to(boundary, "Do something").go_to(control, "Do something").go_to(entity, "Do something")
+    entity.return_to(control, "Return").return_to(boundary, "Return").return_to(actor, "Return")
+    
+    print(sd)
+```
+| DSL                 |                                                          Visualization                                                           |
+|---------------------|:--------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             |                  **NB!** Mermaid does not support all ECB types, only "actor" ![image](images/ecb_mermaid.png)                   |
+| PlantUML            |                                                ![image](images/ecb_plantuml.png)                                                 |
+| D2                  | **NB!** D2 does not support ECB types at all, only "actor" can be simulated using the standard shape ![image](images/ecb_d2.png) |
+| SequenceDiagram.org |                                           ![image](images/ecb_sequencediagramorg.png)                                            |
 </details>

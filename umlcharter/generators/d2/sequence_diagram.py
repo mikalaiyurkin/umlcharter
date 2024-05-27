@@ -35,11 +35,17 @@ class D2SequenceDiagram:
             for index, participant in enumerate(participants)
         }
 
+        participant_types_map = {
+            "default": "",
+            "actor": "{shape: person}",
+            "boundary": "",
+            "control": "",
+            "entity": "",
+        }
+
         generated = f"title: {cls._line_break(sequence_diagram.title)} {{\nshape: sequence_diagram\n"
         for participant in participants:
-            generated += (
-                f"{aliases[participant]}: {cls._line_break(participant.title)}\n"
-            )
+            generated += f"{aliases[participant]}: {cls._line_break(participant.title)} {participant_types_map[participant.type_]}\n"
 
         # NB! In D2 the logic of "activation" phases or "spans" works a bit differently, compared to the other DSLs.
         # You have to know that the participant will be activated
