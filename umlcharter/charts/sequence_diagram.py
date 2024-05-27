@@ -63,6 +63,71 @@ class NoteStep(Step):
 class SequenceDiagramParticipant:
     sequence_ref: "SequenceDiagram"
     title: str
+    type_: typing.Literal["actor", "boundary", "control", "entity", "default"] = field(init=False, default="default")
+
+    def __check_can_set_type(self):
+        if self.type_ != "default":
+            raise AssertionError(
+                f"The type of the participant must be set only once. The current type is '{self.type_}'"
+            )
+
+    def as_actor(self):
+        self.__check_can_set_type()
+        self.type_ = "actor"
+        return self
+
+    def as_boundary(self):
+        self.__check_can_set_type()
+        self.type_ = "boundary"
+        return self
+
+    def as_control(self):
+        self.__check_can_set_type()
+        self.type_ = "control"
+        return self
+
+    def as_entity(self):
+        self.__check_can_set_type()
+        self.type_ = "entity"
+        return self
+
+    def __check_if_interaction_is_possible(self, to: "SequenceDiagramParticipant"):
+        """
+        The check is based on the purpose of the participant, according to the ECB.
+        https://en.wikipedia.org/wiki/Entity-control-boundary
+
+        If the type of the participant is not "default" then only the specific interactions are available:
+
+        - Actors may only know and communicate with boundaries.
+        - Boundaries may communicate with actors and controls only.
+        - Controls may know and communicate with boundaries and entities, and if needed other controls.
+        - Entities may only know about other entities but could communicate also with controls.
+
+        |          | default | actor | boundary | control | entity |
+        ------------------------------------------------------------
+        | default  |    v    |   v   |     v    |    v    |   v    |
+        | actor    |    v    |       |     v    |         |        |
+        | boundary |    v    |   v   |          |    v    |        |
+        | control  |    v    |       |     v    |    v    |   v    |
+        | entity   |    v    |       |          |    v    |   v    |
+        """
+        allowed = (
+            {"default", "default"},
+            {"default", "actor"},
+            {"default", "boundary"},
+            {"default", "control"},
+            {"default", "entity"},
+            {"actor", "boundary"},
+            {"boundary", "control"},
+            {"control", "control"},
+            {"control", "entity"},
+            {"entity", "entity"},
+        )
+
+        if {self.type_, to.type_} not in allowed:
+            raise AssertionError(f"The interaction between '{self.type_}' to '{to.type_}' is not allowed. "
+                                 f"Please correct the types of the participants or remove the use of the types "
+                                 f"if you do not really care about it.")
 
     def __add_step(
         self, step: typing.Union[ForwardStep, ReturnStep, ParticipantActivationControl]
@@ -72,12 +137,14 @@ class SequenceDiagramParticipant:
     def go_to(
         self, to: "SequenceDiagramParticipant", text: str = ""
     ) -> "SequenceDiagramParticipant":
+        self.__check_if_interaction_is_possible(to)
         self.__add_step(ForwardStep(text, from_participant=self, to_participant=to))
         return to
 
     def return_to(
         self, to: "SequenceDiagramParticipant", text: str = ""
     ) -> "SequenceDiagramParticipant":
+        self.__check_if_interaction_is_possible(to)
         self.__add_step(ReturnStep(text, from_participant=self, to_participant=to))
         return to
 

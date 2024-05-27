@@ -56,9 +56,17 @@ class MermaidSequenceDiagram:
             ]
         )
 
+        participant_types_map = {
+            "default": "participant",
+            "actor": "actor",
+            "boundary": "participant",
+            "control": "participant",
+            "entity": "participant",
+        }
+
         generated = f"sequenceDiagram\nTitle: {cls._remove_line_breaks(sequence_diagram.title)}\n"
         for participant in participants:
-            generated += f"participant {aliases[participant]} as {cls._line_break(participant.title)}\n"
+            generated += f"{participant_types_map[participant.type_]} {aliases[participant]} as {cls._line_break(participant.title)}\n"
 
         for step in sequence:
             if isinstance(step, ParticipantActivationControl):
