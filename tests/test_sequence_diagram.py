@@ -898,7 +898,7 @@ deactivate p3
 p2-->>p1: Return
 deactivate p2
 deactivate p1
-"""
+""",
             ),
             (
                 PlantUML,
@@ -923,7 +923,7 @@ p2-->p1: Return
 deactivate p2
 deactivate p1
 @enduml
-"""
+""",
             ),
             (
                 D2,
@@ -940,7 +940,7 @@ p4.3 -> p3.2: Return {style.stroke-dash: 3}
 p3.2 -> p2.1: Return {style.stroke-dash: 3}
 p2.1 -> p1.0: Return {style.stroke-dash: 3}
 }
-"""
+""",
             ),
             (
                 SequenceDiagramOrg,
@@ -963,9 +963,9 @@ deactivate p3
 p2-->p1: Return
 deactivate p2
 deactivate p1
-"""
-            )
-        )
+""",
+            ),
+        ),
     )
     def test_ecb_types_for_participants(self, generator_cls, output):
         sd = SequenceDiagram("Participant types, according to ECB", generator_cls)
@@ -974,8 +974,12 @@ deactivate p1
         control = sd.participant("Control").as_control()
         entity = sd.participant("Entity").as_entity()
 
-        actor.go_to(boundary, "Do something").go_to(control, "Do something").go_to(entity, "Do something")
-        entity.return_to(control, "Return").return_to(boundary, "Return").return_to(actor, "Return")
+        actor.go_to(boundary, "Do something").go_to(control, "Do something").go_to(
+            entity, "Do something"
+        )
+        entity.return_to(control, "Return").return_to(boundary, "Return").return_to(
+            actor, "Return"
+        )
 
         assert str(sd) == output
 
@@ -1023,13 +1027,7 @@ deactivate p1
                 pass
 
     @pytest.mark.parametrize(
-        "callable_",
-        (
-            "as_actor",
-            "as_boundary",
-            "as_control",
-            "as_entity"
-        )
+        "callable_", ("as_actor", "as_boundary", "as_control", "as_entity")
     )
     def test_force_participant_type_being_set_only_once(self, callable_):
         sd = SequenceDiagram("Participant type can be set only once", Mock)
@@ -1050,7 +1048,7 @@ deactivate p1
             ("control", "actor"),
             ("entity", "actor"),
             ("entity", "boundary"),
-        )
+        ),
     )
     def test_only_certain_forward_interactions_are_available(self, from_, to_):
         sd = SequenceDiagram("Not available interactions", Mock)
@@ -1075,7 +1073,7 @@ deactivate p1
             ("control", "actor"),
             ("entity", "actor"),
             ("entity", "boundary"),
-        )
+        ),
     )
     def test_only_certain_return_interactions_are_available(self, from_, to_):
         sd = SequenceDiagram("Not available interactions", Mock)

@@ -63,7 +63,9 @@ class NoteStep(Step):
 class SequenceDiagramParticipant:
     sequence_ref: "SequenceDiagram"
     title: str
-    type_: typing.Literal["actor", "boundary", "control", "entity", "default"] = field(init=False, default="default")
+    type_: typing.Literal["actor", "boundary", "control", "entity", "default"] = field(
+        init=False, default="default"
+    )
 
     def __check_can_set_type(self):
         if self.type_ != "default":
@@ -125,9 +127,11 @@ class SequenceDiagramParticipant:
         )
 
         if {self.type_, to.type_} not in allowed:
-            raise AssertionError(f"The interaction between '{self.type_}' to '{to.type_}' is not allowed. "
-                                 f"Please correct the types of the participants or remove the use of the types "
-                                 f"if you do not really care about it.")
+            raise AssertionError(
+                f"The interaction between '{self.type_}' to '{to.type_}' is not allowed. "
+                f"Please correct the types of the participants or remove the use of the types "
+                f"if you do not really care about it."
+            )
 
     def __add_step(
         self, step: typing.Union[ForwardStep, ReturnStep, ParticipantActivationControl]
