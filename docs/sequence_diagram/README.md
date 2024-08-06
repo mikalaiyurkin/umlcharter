@@ -426,9 +426,7 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 
 _NB 1! The groups cannot be nested._
 
-_NB 2! Unfortunately, at the moment of writing, the D2 does not support the grouping of participants._
-
-_NB 3! You can group the participants that initially were not close to each other, and
+_NB 2! You can group the participants that initially were not close to each other, and
 the order of the participants within the groups can differ from the order defined initially.
 The order of participants in group has the higher priority then the order of participants defined initially_
 
@@ -436,7 +434,7 @@ The order of participants in group has the higher priority then the order of par
 |---------------------|:----------------------------------------------------------------------------------------------------------------------------------------:|
 | Mermaid             |                                            ![image](images/participant_grouping_mermaid.png)                                             |
 | PlantUML            |                                            ![image](images/participant_grouping_plantuml.png)                                            |
-| D2                  | ❌ Not supported at the moment of writing. For D2 the grouping logic will be ignored: ❌<br/> ![image](images/participant_grouping_d2.png) |
+| D2                  | ❌ Not supported at the moment of writing. For D2 the grouping logic will be ignored ❌<br/> ![image](images/participant_grouping_d2.png) |
 | SequenceDiagram.org |                                       ![image](images/participant_grouping_sequencediagramorg.png)                                       |
 
 </details>
@@ -470,10 +468,10 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
     
     print(sd)
 ```
-| DSL                 |                                                          Visualization                                                           |
-|---------------------|:--------------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             |                  **NB!** Mermaid does not support all ECB types, only "actor" ![image](images/ecb_mermaid.png)                   |
-| PlantUML            |                                                ![image](images/ecb_plantuml.png)                                                 |
-| D2                  | **NB!** D2 does not support ECB types at all, only "actor" can be simulated using the standard shape ![image](images/ecb_d2.png) |
-| SequenceDiagram.org |                                           ![image](images/ecb_sequencediagramorg.png)                                            |
+| DSL                 |                                                               Visualization                                                                |
+|---------------------|:------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             |                       **NB!** Mermaid does not support all ECB types, only "actor" ![image](images/ecb_mermaid.png)                        |
+| PlantUML            |                                                     ![image](images/ecb_plantuml.png)                                                      |
+| D2                  | ❌ Not supported at the moment of writing. For D2 only "actor" can be simulated using the standard shape ❌<br/> ![image](images/ecb_d2.png) |
+| SequenceDiagram.org |                                                ![image](images/ecb_sequencediagramorg.png)                                                 |
 </details>
