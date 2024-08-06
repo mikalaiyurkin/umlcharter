@@ -40,6 +40,14 @@ class SequenceDiagramOrgSequenceDiagram:
         aliases = {}
         aliases_counter = 1
 
+        participant_types_map = {
+            "default": "participant",
+            "actor": "actor",
+            "boundary": "boundary",
+            "control": "control",
+            "entity": "entity",
+        }
+
         generated = f"title {cls._line_break(sequence_diagram.title)}\n"
         for group_title, group_participants in participants.items():
             if group_title:
@@ -53,7 +61,7 @@ class SequenceDiagramOrgSequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += f'participant "{cls._line_break(participant.title)}" as {aliases[participant]}\n'
+                generated += f'{participant_types_map[participant.type_]} "{cls._line_break(participant.title)}" as {aliases[participant]}\n'
 
             if group_title:
                 generated += "end\n"

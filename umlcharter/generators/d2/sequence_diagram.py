@@ -34,6 +34,14 @@ class D2SequenceDiagram:
         aliases = {}
         aliases_counter = 1
 
+        participant_types_map = {
+            "default": "",
+            "actor": "{shape: person}",
+            "boundary": "",
+            "control": "",
+            "entity": "",
+        }
+
         generated = f"title: {cls._line_break(sequence_diagram.title)} {{\nshape: sequence_diagram\n"
         for group_title, group_participants in participants.items():
             for participant in group_participants:
@@ -44,9 +52,7 @@ class D2SequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += (
-                    f"{aliases[participant]}: {cls._line_break(participant.title)}\n"
-                )
+                generated += f"{aliases[participant]}: {cls._line_break(participant.title)} {participant_types_map[participant.type_]}\n"
 
         # NB! In D2 the logic of "activation" phases or "spans" works a bit differently, compared to the other DSLs.
         # You have to know that the participant will be activated

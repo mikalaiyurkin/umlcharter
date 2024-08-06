@@ -54,6 +54,14 @@ class MermaidSequenceDiagram:
             ]
         )
 
+        participant_types_map = {
+            "default": "participant",
+            "actor": "actor",
+            "boundary": "participant",
+            "control": "participant",
+            "entity": "participant",
+        }
+
         generated = f"sequenceDiagram\nTitle: {cls._remove_line_breaks(sequence_diagram.title)}\n"
         for group_title, group_participants in participants.items():
             if group_title:
@@ -67,7 +75,7 @@ class MermaidSequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += f"participant {aliases[participant]} as {cls._line_break(participant.title)}\n"
+                generated += f"{participant_types_map[participant.type_]} {aliases[participant]} as {cls._line_break(participant.title)}\n"
 
             if group_title:
                 generated += "end\n"
