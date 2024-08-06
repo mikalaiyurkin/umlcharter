@@ -1,3 +1,5 @@
+import typing
+
 from umlcharter.charts.sequence_diagram import (
     SequenceDiagram,
     SequenceDiagramParticipant,
@@ -21,25 +23,30 @@ class D2SequenceDiagram:
 
     @classmethod
     def generate(cls, sequence_diagram: SequenceDiagram) -> str:
-        participants: list[
-            SequenceDiagramParticipant
+        participants: typing.Dict[
+            typing.Optional[str], typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: list[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
+        sequence: typing.List[
+            Step
+        ] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
         last_targeted_participant: SequenceDiagramParticipant | None = None
-        if participants:
-            last_targeted_participant = participants[0]
-
-        aliases = {
-            participant: f"p{index + 1}"
-            for index, participant in enumerate(participants)
-        }
+        aliases = {}
+        aliases_counter = 1
 
         generated = f"title: {cls._line_break(sequence_diagram.title)} {{\nshape: sequence_diagram\n"
-        for participant in participants:
-            generated += (
-                f"{aliases[participant]}: {cls._line_break(participant.title)}\n"
-            )
+        for group_title, group_participants in participants.items():
+            for participant in group_participants:
+                # define initial last targeted participant
+                if not last_targeted_participant:
+                    last_targeted_participant = participant
+
+                aliases[participant] = f"p{aliases_counter}"
+                aliases_counter += 1
+
+                generated += (
+                    f"{aliases[participant]}: {cls._line_break(participant.title)}\n"
+                )
 
         # NB! In D2 the logic of "activation" phases or "spans" works a bit differently, compared to the other DSLs.
         # You have to know that the participant will be activated
