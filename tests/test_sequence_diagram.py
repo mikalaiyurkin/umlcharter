@@ -1033,11 +1033,11 @@ activate p5
         p4 = sd.participant("Participant 4")
         p5 = sd.participant("Participant 5")
 
-        sd.group_participants("A third\ngroup", p4, p5)
-
         p1.go_to(p2, "Pass a message").go_to(p3, "Pass a message").go_to(
             p4, "Pass a message"
         ).go_to(p5, "Message!")
+
+        sd.group_participants("A third\ngroup", p4, p5)
 
         assert str(sd) == output
 
