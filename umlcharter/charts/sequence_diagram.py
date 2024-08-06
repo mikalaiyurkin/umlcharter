@@ -257,7 +257,7 @@ class SequenceDiagram(BaseChart):
         if not self.__participants.get(None):
             self.__participants.pop(None, None)
 
-        self.__participants |= {title: list(participants)}
+        self.__participants[title] = list(participants)
 
     def note(self, text: str) -> None:
         """
