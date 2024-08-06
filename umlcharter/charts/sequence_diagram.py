@@ -1,6 +1,7 @@
 import typing
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from itertools import chain
 
 from umlcharter.charts.types import BaseChart
 from umlcharter.generators.base import IChartGenerator
@@ -187,7 +188,9 @@ class SequenceDiagram(BaseChart):
     generator_cls: typing.Type[IChartGenerator]
     auto_activation: bool = True
 
-    __participants: typing.List[SequenceDiagramParticipant] = field(init=False)
+    __participants: typing.Dict[
+        typing.Optional[str], typing.List[SequenceDiagramParticipant]
+    ] = field(init=False)
     __sequence: typing.List[Step] = field(init=False)
     __auto_activation_stack: typing.List[
         typing.Union[
@@ -199,7 +202,7 @@ class SequenceDiagram(BaseChart):
     __inside_condition: bool = field(init=False)
 
     def __post_init__(self):
-        self.__participants = []
+        self.__participants = {None: []}
         self.__sequence = []
         self.__inside_condition = False
         self.__auto_activation_stack = []
@@ -207,20 +210,58 @@ class SequenceDiagram(BaseChart):
 
     def participant(self, title: str) -> SequenceDiagramParticipant:
         # NB: every participant must have a unique name
-        if title in [_.title for _ in self.__participants]:
+        all_registered_participant_titles = [
+            _.title for _ in chain.from_iterable(self.__participants.values())
+        ]
+        if title in all_registered_participant_titles:
             raise AssertionError(
                 f"Sequence diagram already contains participant {title}. "
                 f"All participants must have unique titles."
             )
         participant = SequenceDiagramParticipant(title=title, sequence_ref=self)
-        self.__participants.append(participant)
+        # add the participant to the default group
+        if None not in self.__participants:
+            self.__participants[None] = []
+        self.__participants[None].append(participant)
         return participant
+
+    def group_participants(
+        self, title: str, *participants: SequenceDiagramParticipant
+    ) -> None:
+        """
+        Visually join (group, encompass, box) participants to emphasize the connections or similarities between them
+
+        NB 1: the name of this new group must be unique.
+        NB 2: every participant can participate in one group only
+        """
+        if not title or title in self.__participants:
+            raise AssertionError(
+                "The given name of the named group of joint participants "
+                "must be unique and not empty."
+            )
+
+        for participant in participants:
+            if participant not in self.__participants.get(None, []):
+                raise AssertionError(
+                    f"The participant {participant.title} does not belong to the default group "
+                    "and therefor cannot be moved to the named one."
+                )
+
+        # remove the mentioned participants from the default group and put them to the new one
+        self.__participants[None] = [
+            participant
+            for participant in self.__participants.get(None, [])
+            if participant not in participants
+        ]
+        # there must be no empty groups
+        if not self.__participants.get(None):
+            self.__participants.pop(None, None)
+
+        self.__participants[title] = list(participants)
 
     def note(self, text: str) -> None:
         """
         Add the note plate with the iven text somewhere inside the diagram
-        :param text:
-        :return:
         """
         self.__add_step(NoteStep(text=text))
 
@@ -247,7 +288,7 @@ class SequenceDiagram(BaseChart):
             previously_active_participant = self.__auto_activation_stack[-1]
         except IndexError:
             raise AssertionError(
-                "Sequence diagram stack does not hold the previous participant to return to. "
+                "Sequence diagram stack does not hold the previous participant to return to."
             )
         self.__add_step(
             ReturnStep(

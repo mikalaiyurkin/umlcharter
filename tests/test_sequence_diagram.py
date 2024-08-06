@@ -813,6 +813,241 @@ note right of p1: Batman is sad now
             (
                 Mermaid,
                 """sequenceDiagram
+Title: Diagram Participants Grouping
+participant p1 as Participant 1
+participant p2 as Participant 4
+box A first group
+participant p3 as Participant 2
+participant p4 as Participant 3
+end
+box A second group
+participant p5 as Participant 5
+end
+activate p1
+p1->>p3: Pass a message
+activate p3
+p3->>p4: Pass a message
+activate p4
+p4->>p2: Pass a message
+activate p2
+p2->>p5: Message!
+activate p5
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title: Diagram Participants Grouping
+participant "Participant 1" as p1
+participant "Participant 4" as p2
+box "A first\\ngroup"
+participant "Participant 2" as p3
+participant "Participant 3" as p4
+end box
+box "A second\\ngroup"
+participant "Participant 5" as p5
+end box
+activate p1
+p1->p3: Pass a message
+activate p3
+p3->p4: Pass a message
+activate p4
+p4->p2: Pass a message
+activate p2
+p2->p5: Message!
+activate p5
+@enduml
+""",
+            ),
+            (
+                D2,
+                """title: Diagram Participants Grouping {
+shape: sequence_diagram
+p1: Participant 1 
+p2: Participant 4 
+p3: Participant 2 
+p4: Participant 3 
+p5: Participant 5 
+p1.0 -> p3.1: Pass a message
+p3.1 -> p4.2: Pass a message
+p4.2 -> p2.3: Pass a message
+p2.3 -> p5.4: Message!
+}
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Participants Grouping
+participant "Participant 1" as p1
+participant "Participant 4" as p2
+participantgroup **A first\\ngroup**
+participant "Participant 2" as p3
+participant "Participant 3" as p4
+end
+participantgroup **A second\\ngroup**
+participant "Participant 5" as p5
+end
+activate p1
+p1->p3: Pass a message
+activate p3
+p3->p4: Pass a message
+activate p4
+p4->p2: Pass a message
+activate p2
+p2->p5: Message!
+activate p5
+""",
+            ),
+        ),
+    )
+    def test_hectic_participant_grouping(self, generator_cls, output):
+        sd = SequenceDiagram(
+            "Diagram Participants Grouping",
+            generator_cls,
+        )
+        not_grouped_1 = sd.participant("Participant 1")
+        grouped_2 = sd.participant("Participant 2")
+        grouped_3 = sd.participant("Participant 3")
+        not_grouped_4 = sd.participant("Participant 4")
+        grouped_5 = sd.participant("Participant 5")
+
+        not_grouped_1.go_to(grouped_2, "Pass a message").go_to(
+            grouped_3, "Pass a message"
+        ).go_to(not_grouped_4, "Pass a message").go_to(grouped_5, "Message!")
+
+        sd.group_participants("A first\ngroup", grouped_2, grouped_3)
+        sd.group_participants("A second\ngroup", grouped_5)
+        print(str(sd))
+        assert str(sd) == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+            (
+                Mermaid,
+                """sequenceDiagram
+Title: Diagram Participants Grouping
+box A first group
+participant p1 as Participant 1
+participant p2 as Participant 2
+end
+box A second group
+participant p3 as Participant 3
+end
+box A third group
+participant p4 as Participant 4
+participant p5 as Participant 5
+end
+activate p1
+p1->>p2: Pass a message
+activate p2
+p2->>p3: Pass a message
+activate p3
+p3->>p4: Pass a message
+activate p4
+p4->>p5: Message!
+activate p5
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title: Diagram Participants Grouping
+box "A first\\ngroup"
+participant "Participant 1" as p1
+participant "Participant 2" as p2
+end box
+box "A second\\ngroup"
+participant "Participant 3" as p3
+end box
+box "A third\\ngroup"
+participant "Participant 4" as p4
+participant "Participant 5" as p5
+end box
+activate p1
+p1->p2: Pass a message
+activate p2
+p2->p3: Pass a message
+activate p3
+p3->p4: Pass a message
+activate p4
+p4->p5: Message!
+activate p5
+@enduml
+""",
+            ),
+            (
+                D2,
+                """title: Diagram Participants Grouping {
+shape: sequence_diagram
+p1: Participant 1 
+p2: Participant 2 
+p3: Participant 3 
+p4: Participant 4 
+p5: Participant 5 
+p1.0 -> p2.1: Pass a message
+p2.1 -> p3.2: Pass a message
+p3.2 -> p4.3: Pass a message
+p4.3 -> p5.4: Message!
+}
+""",
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Diagram Participants Grouping
+participantgroup **A first\\ngroup**
+participant "Participant 1" as p1
+participant "Participant 2" as p2
+end
+participantgroup **A second\\ngroup**
+participant "Participant 3" as p3
+end
+participantgroup **A third\\ngroup**
+participant "Participant 4" as p4
+participant "Participant 5" as p5
+end
+activate p1
+p1->p2: Pass a message
+activate p2
+p2->p3: Pass a message
+activate p3
+p3->p4: Pass a message
+activate p4
+p4->p5: Message!
+activate p5
+""",
+            ),
+        ),
+    )
+    def test_accurate_participant_grouping(self, generator_cls, output):
+        sd = SequenceDiagram(
+            "Diagram Participants Grouping",
+            generator_cls,
+        )
+        p1 = sd.participant("Participant 1")
+        p2 = sd.participant("Participant 2")
+        p3 = sd.participant("Participant 3")
+
+        sd.group_participants("A first\ngroup", p1, p2)
+        sd.group_participants("A second\ngroup", p3)
+
+        p4 = sd.participant("Participant 4")
+        p5 = sd.participant("Participant 5")
+
+        p1.go_to(p2, "Pass a message").go_to(p3, "Pass a message").go_to(
+            p4, "Pass a message"
+        ).go_to(p5, "Message!")
+
+        sd.group_participants("A third\ngroup", p4, p5)
+
+        assert str(sd) == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+            (
+                Mermaid,
+                """sequenceDiagram
 Title: Empty Transitions between Participants
 participant p1 as First
 participant p2 as Second
@@ -1086,3 +1321,36 @@ deactivate p1
 
         with pytest.raises(AssertionError):
             a.return_to(b, "Do something")
+
+    @pytest.mark.parametrize("title", (None, ""))
+    def test_cannot_group_participants_under_group_with_empty_name(self, title):
+        sd = SequenceDiagram(
+            "Violated participants group naming - empty names not allowed", Mock
+        )
+        first = sd.participant("First")
+        second = sd.participant("Second")
+        with pytest.raises(AssertionError):
+            sd.group_participants(title, first, second)
+
+    def test_cannot_use_same_group_names_multiple_times(self):
+        sd = SequenceDiagram(
+            "Violated participants group naming - group names must be unique", Mock
+        )
+        first = sd.participant("First")
+        second = sd.participant("Second")
+        group_title = Mock()
+        sd.group_participants(group_title, first)
+        with pytest.raises(AssertionError):
+            sd.group_participants(group_title, second)
+
+    def test_cannot_put_same_participant_to_different_groups(self):
+        sd = SequenceDiagram(
+            "Violated participants group conditions - participant can be only in one group",
+            Mock,
+        )
+        first = sd.participant("First")
+        group_title_1 = Mock()
+        group_title_2 = Mock()
+        sd.group_participants(group_title_1, first)
+        with pytest.raises(AssertionError):
+            sd.group_participants(group_title_2, first)
