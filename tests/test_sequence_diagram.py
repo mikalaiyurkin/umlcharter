@@ -863,11 +863,11 @@ activate p5
                 D2,
                 """title: Diagram Participants Grouping {
 shape: sequence_diagram
-p1: Participant 1
-p2: Participant 4
-p3: Participant 2
-p4: Participant 3
-p5: Participant 5
+p1: Participant 1 
+p2: Participant 4 
+p3: Participant 2 
+p4: Participant 3 
+p5: Participant 5 
 p1.0 -> p3.1: Pass a message
 p3.1 -> p4.2: Pass a message
 p4.2 -> p2.3: Pass a message
@@ -917,6 +917,7 @@ activate p5
 
         sd.group_participants("A first\ngroup", grouped_2, grouped_3)
         sd.group_participants("A second\ngroup", grouped_5)
+        print(str(sd))
         assert str(sd) == output
 
     @pytest.mark.parametrize(
@@ -979,11 +980,11 @@ activate p5
                 D2,
                 """title: Diagram Participants Grouping {
 shape: sequence_diagram
-p1: Participant 1
-p2: Participant 2
-p3: Participant 3
-p4: Participant 4
-p5: Participant 5
+p1: Participant 1 
+p2: Participant 2 
+p3: Participant 3 
+p4: Participant 4 
+p5: Participant 5 
 p1.0 -> p2.1: Pass a message
 p2.1 -> p3.2: Pass a message
 p3.2 -> p4.3: Pass a message
