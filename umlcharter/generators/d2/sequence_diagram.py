@@ -3,6 +3,7 @@ import typing
 from umlcharter.charts.sequence_diagram import (
     SequenceDiagram,
     SequenceDiagramParticipant,
+    SequenceDiagramParticipantGroup,
     Step,
     ParticipantActivationControl,
     ForwardStep,
@@ -24,7 +25,7 @@ class D2SequenceDiagram:
     @classmethod
     def generate(cls, sequence_diagram: SequenceDiagram) -> str:
         participants: typing.Dict[
-            typing.Optional[str], typing.List[SequenceDiagramParticipant]
+            SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: typing.List[
             Step
@@ -36,14 +37,14 @@ class D2SequenceDiagram:
 
         participant_types_map = {
             "default": "",
-            "actor": "{shape: person}",
+            "actor": "person",
             "boundary": "",
             "control": "",
             "entity": "",
         }
 
         generated = f"title: {cls._line_break(sequence_diagram.title)} {{\nshape: sequence_diagram\n"
-        for group_title, group_participants in participants.items():
+        for _, group_participants in participants.items():
             for participant in group_participants:
                 # define initial last targeted participant
                 if not last_targeted_participant:
@@ -52,7 +53,19 @@ class D2SequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += f"{aliases[participant]}: {cls._line_break(participant.title)} {participant_types_map[participant.type_]}\n"
+                generated += (
+                    f"{aliases[participant]}: {cls._line_break(participant.title)} "
+                )
+                if participant.color or participant_types_map[participant.type_]:
+                    generated += "{\n"
+                    if participant.color:
+                        generated += f'style: {{fill: "{participant.color.as_hex()}" \nstroke:"{participant.color.as_hex()}" }}\n'
+                    if participant_types_map[participant.type_]:
+                        generated += (
+                            f"shape: {participant_types_map[participant.type_]}\n"
+                        )
+                    generated += "}"
+                generated += "\n"
 
         # NB! In D2 the logic of "activation" phases or "spans" works a bit differently, compared to the other DSLs.
         # You have to know that the participant will be activated
@@ -74,7 +87,7 @@ class D2SequenceDiagram:
                 new_seq[index], new_seq[index + 1] = new_seq[index + 1], new_seq[index]
 
         activation_counter = 0
-        alt_counter = 1
+        custom_element_counter = 1
         for step in new_seq:
             if isinstance(step, ParticipantActivationControl):
                 if step.is_active:
@@ -93,34 +106,47 @@ class D2SequenceDiagram:
                 generated += f"{aliases[step.from_participant]} -> {aliases[step.to_participant]}: {cls._line_break(step.text)} {{style.stroke-dash: 3}}\n"
                 last_targeted_participant = step.to_participant
 
+            if isinstance(step, NoteStep):
+                generated += f'{aliases[last_targeted_participant]}."{cls._line_break(step.text)}"\n'
+
             if isinstance(step, GroupControl):
                 if step.is_active:
-                    generated += f"{cls._line_break(step.text)}: {{\n"
+                    generated += f"group{custom_element_counter}: \[GROUP\] {cls._line_break(step.text)}: {{"
+                    if step.color:
+                        generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
+                    generated += "\n"
+                    custom_element_counter += 1
                 else:
                     generated += "}\n"
 
             if isinstance(step, LoopControl):
                 if step.is_active:
-                    generated += f'LOOP {cls._line_break(step.how_many_iterations)}: {{\nstyle: {{\nborder-radius: 50\nfill: "#ffdfbf"\n}}\n'
+                    generated += f"loop{custom_element_counter}: \[LOOP\] {cls._line_break(step.how_many_iterations)}: {{"
+                    if step.color:
+                        generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
+                    generated += "\n"
+                    custom_element_counter += 1
                 else:
                     generated += "}\n"
 
             if isinstance(step, ConditionControl):
                 if step.is_active:
-                    generated += (
-                        f'alt{alt_counter}: ALT {{\nstyle: {{\nfill: "#ffdfbf"\n}}\n'
-                    )
-                    alt_counter += 1
+                    generated += f"alt{custom_element_counter}: \[ALT\] {{"
+                    if step.color:
+                        generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
+                    generated += "\n"
+                    custom_element_counter += 1
                 else:
                     generated += "}\n"
 
             if isinstance(step, CaseControl):
                 if step.is_active:
-                    generated += f'CASE {cls._line_break(step.text)}: {{\nstyle: {{\nfill: "#f6c5c2"\n}}\n'
+                    generated += f"case{custom_element_counter}: \[CASE\] {cls._line_break(step.text)}: {{"
+                    if step.color:
+                        generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
+                    generated += "\n"
+                    custom_element_counter += 1
                 else:
                     generated += "}\n"
-
-            if isinstance(step, NoteStep):
-                generated += f'{aliases[last_targeted_participant]}."{cls._line_break(step.text)}"\n'
 
         return generated + "}\n"

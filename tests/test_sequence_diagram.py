@@ -55,8 +55,8 @@ participant p2 as Second
                 PlantUML,
                 """@startuml
 title: Diagram Only Participants
-participant "First" as p1
-participant "Second" as p2
+participant "First" as p1 
+participant "Second" as p2 
 @enduml
 """,
             ),
@@ -138,22 +138,22 @@ p3-->>p1: Return to first
                 True,
                 """@startuml
 title: Diagram Interaction\\nand Auto Activation
-participant "First\\nParticipant" as p1
-participant "Second\\nParticipant" as p2
-participant "Third\\nParticipant" as p3
-participant "Fourth\\nParticipant" as p4
-activate p1
+participant "First\\nParticipant" as p1 
+participant "Second\\nParticipant" as p2 
+participant "Third\\nParticipant" as p3 
+participant "Fourth\\nParticipant" as p4 
+activate p1 
 p1->p2: Go to second
-activate p2
+activate p2 
 p2-->p1: Return to first
 deactivate p2
 deactivate p1
 p1 -[hidden]-> p1
-activate p1
+activate p1 
 p1->p3: Go to third
-activate p3
+activate p3 
 p3->p4: Go to fourth
-activate p4
+activate p4 
 p4->p4: Go to self
 p4-->p3: Return to third
 deactivate p4
@@ -168,10 +168,10 @@ deactivate p1
                 False,
                 """@startuml
 title: Diagram Interaction\\nand Auto Activation
-participant "First\\nParticipant" as p1
-participant "Second\\nParticipant" as p2
-participant "Third\\nParticipant" as p3
-participant "Fourth\\nParticipant" as p4
+participant "First\\nParticipant" as p1 
+participant "Second\\nParticipant" as p2 
+participant "Third\\nParticipant" as p3 
+participant "Fourth\\nParticipant" as p4 
 p1->p2: Go to second
 p2-->p1: Return to first
 p1->p3: Go to third
@@ -308,11 +308,11 @@ deactivate p1
                 PlantUML,
                 """@startuml
 title: Diagram Interaction and Manual Activation
-participant "First" as p1
-participant "Second" as p2
-activate p1
+participant "First" as p1 
+participant "Second" as p2 #769D8F
+activate p1 
 p1->p2: Go to second
-activate p2
+activate p2 #769D8F
 p2->p2: Go to self
 p2-->p1: Return to first
 deactivate p2
@@ -325,7 +325,10 @@ deactivate p1
                 """title: Diagram Interaction and Manual Activation {
 shape: sequence_diagram
 p1: First 
-p2: Second 
+p2: Second {
+style: {fill: "#769D8F" 
+stroke:"#769D8F" }
+}
 p1.0 -> p2.1: Go to second
 p2.1 -> p2.1: Go to self
 p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
@@ -336,10 +339,10 @@ p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
                 SequenceDiagramOrg,
                 """title Diagram Interaction and Manual Activation
 participant "First" as p1
-participant "Second" as p2
+participant "Second" as p2#769D8F
 activate p1
 p1->p2: Go to second
-activate p2
+activate p2#769D8F
 p2->p2: Go to self
 p2-->p1: Return to first
 deactivate p2
@@ -354,12 +357,13 @@ deactivate p1
             generator_cls=generator_cls,
             auto_activation=False,
         )
+        green_color = "769D8F"  # some shade of green color
         first = sd.participant("First")
-        second = sd.participant("Second")
+        second = sd.participant("Second", color=green_color)
 
         with first.activate():
             first.go_to(second, "Go to second")
-            with second.activate():
+            with second.activate(color=green_color):
                 second.go_to(second, "Go to self")
                 second.return_to(first, "Return to first")
 
@@ -375,12 +379,12 @@ Title: Diagram Interaction and Grouping
 participant p1 as First
 participant p2 as Second
 participant p3 as Third
-rect rgb(121, 210, 166)
+rect rgb(230, 230, 240, 0.5)
 note right of p1: Group enclosing everything
 activate p1
 p1->>p2: Go to second
 activate p2
-rect rgb(51, 153, 102)
+rect rgb(230, 230, 240, 0.5)
 note right of p2: Group enclosing interaction<br/>between second and third
 p2->>p3: Go to third
 activate p3
@@ -397,16 +401,16 @@ end
                 PlantUML,
                 """@startuml
 title: Diagram Interaction and Grouping
-participant "First" as p1
-participant "Second" as p2
-participant "Third" as p3
-group Group enclosing everything
-activate p1
+participant "First" as p1 
+participant "Second" as p2 
+participant "Third" as p3 
+group  Group enclosing everything
+activate p1 
 p1->p2: Go to second
-activate p2
-group Group enclosing interaction\\nbetween second and third
+activate p2 
+group#769D8F #769D8F Group enclosing interaction\\nbetween second and third
 p2->p3: Go to third
-activate p3
+activate p3 
 p3-->p2: Return to second
 deactivate p3
 end
@@ -424,9 +428,12 @@ shape: sequence_diagram
 p1: First 
 p2: Second 
 p3: Third 
-Group enclosing everything: {
+group1: \\[GROUP\\] Group enclosing everything: {
 p1.0 -> p2.1: Go to second
-Group enclosing interaction\\nbetween second and third: {
+group2: \\[GROUP\\] Group enclosing interaction\\nbetween second and third: {
+style: {
+fill: "#769D8F" 
+}
 p2.1 -> p3.2: Go to third
 p3.2 -> p2.1: Return to second {style.stroke-dash: 3}
 }
@@ -445,7 +452,7 @@ group [Group enclosing everything]
 activate p1
 p1->p2: Go to second
 activate p2
-group [Group enclosing interaction between second and third]
+group#769D8F [Group enclosing interaction between second and third]
 p2->p3: Go to third
 activate p3
 p3-->p2: Return to second
@@ -470,7 +477,9 @@ end
 
         with sd.group("Group enclosing everything"):
             first.go_to(second, "Go to second")
-            with sd.group("Group enclosing interaction\nbetween second and third"):
+            with sd.group(
+                "Group enclosing interaction\nbetween second and third", color="769D8F"
+            ):
                 second.go_to(third, "Go to third").return_to(second, "Return to second")
             second.return_to(first, "Return to first")
         assert str(sd) == output
@@ -501,13 +510,13 @@ end
                 PlantUML,
                 """@startuml
 title: Diagram Interaction and Loops
-participant "First" as p1
-participant "Second" as p2
-loop Infinite loop
-activate p1
+participant "First" as p1 
+participant "Second" as p2 
+loop  Infinite loop
+activate p1 
 p1->p2: Send request to second
-activate p2
-loop Repeat\\nuntil available
+activate p2 
+loop#769D8F #769D8F Repeat\\nuntil available
 p2->p2: Check internal state
 end
 p2-->p1: Return response
@@ -523,16 +532,11 @@ end
 shape: sequence_diagram
 p1: First 
 p2: Second 
-LOOP Infinite loop: {
-style: {
-border-radius: 50
-fill: "#ffdfbf"
-}
+loop1: \\[LOOP\\] Infinite loop: {
 p1.0 -> p2.1: Send request to second
-LOOP Repeat\\nuntil available: {
+loop2: \\[LOOP\\] Repeat\\nuntil available: {
 style: {
-border-radius: 50
-fill: "#ffdfbf"
+fill: "#769D8F" 
 }
 p2.1 -> p2.1: Check internal state
 }
@@ -550,7 +554,7 @@ loop Infinite loop
 activate p1
 p1->p2: Send request to second
 activate p2
-loop Repeat until available
+loop#769D8F Repeat until available
 p2->p2: Check internal state
 end
 p2-->p1: Return response
@@ -571,10 +575,9 @@ end
 
         with sd.loop("Infinite loop"):
             first.go_to(second, "Send request to second")
-            with sd.loop("Repeat\nuntil available"):
+            with sd.loop("Repeat\nuntil available", color="769D8F"):
                 second.go_to(second, "Check internal state")
             sd.return_("Return response")
-
         assert str(sd) == output
 
     @pytest.mark.parametrize(
@@ -605,31 +608,70 @@ p3-->>p1: Laugh a lot
 deactivate p3
 deactivate p1
 end
+activate p1
+p1->>p1: What would I like to watch tomorrow?
+deactivate p1
+alt Want a drama
+activate p1
+p1->>p2: Watch drama
+activate p2
+p2-->>p1: Tears and sadness
+deactivate p2
+deactivate p1
+else Want a comedy
+activate p1
+p1->>p3: Watch comedy
+activate p3
+p3-->>p1: Laugh a lot
+deactivate p3
+deactivate p1
+end
 """,
             ),
             (
                 PlantUML,
                 """@startuml
 title: Diagram Interaction and Conditions
-participant "Viewer" as p1
-participant "Drama" as p2
-participant "Comedy" as p3
-activate p1
+participant "Viewer" as p1 
+participant "Drama" as p2 
+participant "Comedy" as p3 
+activate p1 
 p1->p1: What would I like to watch today?
 deactivate p1
-alt Want a drama
+alt #FFFFFF Want a drama
 p1 -[hidden]-> p1
-activate p1
+activate p1 
 p1->p2: Watch drama
-activate p2
+activate p2 
 p2-->p1: Tears and sadness
 deactivate p2
 deactivate p1
-else Want a comedy
+else #FFFFFF Want a comedy
 p1 -[hidden]-> p1
-activate p1
+activate p1 
 p1->p3: Watch comedy
-activate p3
+activate p3 
+p3-->p1: Laugh a lot
+deactivate p3
+deactivate p1
+end
+p1 -[hidden]-> p1
+activate p1 
+p1->p1: What would I like to watch tomorrow?
+deactivate p1
+alt#b2b200 #FFFFFF Want a drama
+p1 -[hidden]-> p1
+activate p1 
+p1->p2: Watch drama
+activate p2 
+p2-->p1: Tears and sadness
+deactivate p2
+deactivate p1
+else #66b266 Want a comedy
+p1 -[hidden]-> p1
+activate p1 
+p1->p3: Watch comedy
+activate p3 
 p3-->p1: Laugh a lot
 deactivate p3
 deactivate p1
@@ -645,23 +687,31 @@ p1: Viewer
 p2: Drama 
 p3: Comedy 
 p1.0 -> p1.0: What would I like to watch today?
-alt1: ALT {
-style: {
-fill: "#ffdfbf"
-}
-CASE Want a drama: {
-style: {
-fill: "#f6c5c2"
-}
+alt1: \\[ALT\\] {
+case2: \\[CASE\\] Want a drama: {
 p1.1 -> p2.2: Watch drama
 p2.2 -> p1.1: Tears and sadness {style.stroke-dash: 3}
 }
-CASE Want a comedy: {
-style: {
-fill: "#f6c5c2"
-}
+case3: \\[CASE\\] Want a comedy: {
 p1.3 -> p3.4: Watch comedy
 p3.4 -> p1.3: Laugh a lot {style.stroke-dash: 3}
+}
+}
+p1.5 -> p1.5: What would I like to watch tomorrow?
+alt4: \\[ALT\\] {
+style: {
+fill: "#b2b200" 
+}
+case5: \\[CASE\\] Want a drama: {
+p1.6 -> p2.7: Watch drama
+p2.7 -> p1.6: Tears and sadness {style.stroke-dash: 3}
+}
+case6: \\[CASE\\] Want a comedy: {
+style: {
+fill: "#66b266" 
+}
+p1.8 -> p3.9: Watch comedy
+p3.9 -> p1.8: Laugh a lot {style.stroke-dash: 3}
 }
 }
 }
@@ -677,6 +727,24 @@ activate p1
 p1->p1: What would I like to watch today?
 deactivate p1
 alt Want a drama
+activate p1
+p1->p2: Watch drama
+activate p2
+p2-->p1: Tears and sadness
+deactivate p2
+deactivate p1
+else Want a comedy
+activate p1
+p1->p3: Watch comedy
+activate p3
+p3-->p1: Laugh a lot
+deactivate p3
+deactivate p1
+end
+activate p1
+p1->p1: What would I like to watch tomorrow?
+deactivate p1
+alt#b2b200 Want a drama
 activate p1
 p1->p2: Watch drama
 activate p2
@@ -708,6 +776,7 @@ end
 
         with viewer.activate():
             viewer.go_to(viewer, "What would I like to watch today?")
+
         with sd.condition():
             with sd.case("Want a drama"):
                 with viewer.activate():
@@ -715,6 +784,24 @@ end
                     with drama.activate():
                         drama.return_to(viewer, "Tears and sadness")
             with sd.case("Want a comedy"):
+                with viewer.activate():
+                    viewer.go_to(comedy, "Watch comedy")
+                    with comedy.activate():
+                        comedy.return_to(viewer, "Laugh a lot")
+
+        with viewer.activate():
+            viewer.go_to(viewer, "What would I like to watch tomorrow?")
+
+        green_yellow_color = "b2b200"
+        green_color = "66b266"
+
+        with sd.condition(color=green_yellow_color):
+            with sd.case("Want a drama"):
+                with viewer.activate():
+                    viewer.go_to(drama, "Watch drama")
+                    with drama.activate():
+                        drama.return_to(viewer, "Tears and sadness")
+            with sd.case("Want a comedy", color=green_color):
                 with viewer.activate():
                     viewer.go_to(comedy, "Watch comedy")
                     with comedy.activate():
@@ -745,17 +832,17 @@ note right of p1: Batman is sad now
                 PlantUML,
                 """@startuml
 title: Diagram Interaction and Notes
-participant "Batman" as p1
-participant "Bandit" as p2
-note right of p1: Batman is throwing\\na batarang at the bandit
-activate p1
+participant "Batman" as p1 
+participant "Bandit" as p2 
+note right of p1 : Batman is throwing\\na batarang at the bandit
+activate p1 
 p1->p2: Pheeeeeeu!
-activate p2
-note right of p2: Batman has missed!
+activate p2 
+note right of p2 #769D8F: Batman has missed!
 p2-->p1: A bad day\\nfor the Gotham :(
 deactivate p2
 deactivate p1
-note right of p1: Batman is sad now
+note right of p1 : Batman is sad now
 @enduml
 """,
             ),
@@ -782,7 +869,7 @@ note right of p1: Batman is throwing\\na batarang at the bandit
 activate p1
 p1->p2: Pheeeeeeu!
 activate p2
-note right of p2: Batman has missed!
+note right of p2#769D8F: Batman has missed!
 p2-->p1: A bad day\\nfor the Gotham :(
 deactivate p2
 deactivate p1
@@ -802,7 +889,7 @@ note right of p1: Batman is sad now
 
         sd.note("Batman is throwing\na batarang at the bandit")
         batman.go_to(bandit, "Pheeeeeeu!")
-        sd.note("Batman has missed!")
+        sd.note("Batman has missed!", color="769D8F")
         sd.return_("A bad day\nfor the Gotham :(")
         sd.note("Batman is sad now")
         assert str(sd) == output
@@ -838,24 +925,24 @@ activate p5
                 PlantUML,
                 """@startuml
 title: Diagram Participants Grouping
-participant "Participant 1" as p1
-participant "Participant 4" as p2
-box "A first\\ngroup"
-participant "Participant 2" as p3
-participant "Participant 3" as p4
+participant "Participant 1" as p1 
+participant "Participant 4" as p2 
+box "A first\\ngroup" 
+participant "Participant 2" as p3 
+participant "Participant 3" as p4 
 end box
-box "A second\\ngroup"
-participant "Participant 5" as p5
+box "A second\\ngroup" 
+participant "Participant 5" as p5 
 end box
-activate p1
+activate p1 
 p1->p3: Pass a message
-activate p3
+activate p3 
 p3->p4: Pass a message
-activate p4
+activate p4 
 p4->p2: Pass a message
-activate p2
+activate p2 
 p2->p5: Message!
-activate p5
+activate p5 
 @enduml
 """,
             ),
@@ -953,26 +1040,26 @@ activate p5
                 PlantUML,
                 """@startuml
 title: Diagram Participants Grouping
-box "A first\\ngroup"
-participant "Participant 1" as p1
-participant "Participant 2" as p2
+box "A first\\ngroup" #b2b200
+participant "Participant 1" as p1 #769D8F
+participant "Participant 2" as p2 #66b266
 end box
-box "A second\\ngroup"
-participant "Participant 3" as p3
+box "A second\\ngroup" 
+participant "Participant 3" as p3 
 end box
-box "A third\\ngroup"
-participant "Participant 4" as p4
-participant "Participant 5" as p5
+box "A third\\ngroup" 
+participant "Participant 4" as p4 
+participant "Participant 5" as p5 
 end box
-activate p1
+activate p1 
 p1->p2: Pass a message
-activate p2
+activate p2 
 p2->p3: Pass a message
-activate p3
+activate p3 
 p3->p4: Pass a message
-activate p4
+activate p4 
 p4->p5: Message!
-activate p5
+activate p5 
 @enduml
 """,
             ),
@@ -980,8 +1067,14 @@ activate p5
                 D2,
                 """title: Diagram Participants Grouping {
 shape: sequence_diagram
-p1: Participant 1 
-p2: Participant 2 
+p1: Participant 1 {
+style: {fill: "#769D8F" 
+stroke:"#769D8F" }
+}
+p2: Participant 2 {
+style: {fill: "#66b266" 
+stroke:"#66b266" }
+}
 p3: Participant 3 
 p4: Participant 4 
 p5: Participant 5 
@@ -995,9 +1088,9 @@ p4.3 -> p5.4: Message!
             (
                 SequenceDiagramOrg,
                 """title Diagram Participants Grouping
-participantgroup **A first\\ngroup**
-participant "Participant 1" as p1
-participant "Participant 2" as p2
+participantgroup#b2b200 **A first\\ngroup**
+participant "Participant 1" as p1#769D8F
+participant "Participant 2" as p2#66b266
 end
 participantgroup **A second\\ngroup**
 participant "Participant 3" as p3
@@ -1024,11 +1117,15 @@ activate p5
             "Diagram Participants Grouping",
             generator_cls,
         )
-        p1 = sd.participant("Participant 1")
-        p2 = sd.participant("Participant 2")
+        green_color = "769D8F"
+        another_green_color = "66b266"
+        green_yellow_color = "b2b200"
+
+        p1 = sd.participant("Participant 1", color=green_color)
+        p2 = sd.participant("Participant 2", color=another_green_color)
         p3 = sd.participant("Participant 3")
 
-        sd.group_participants("A first\ngroup", p1, p2)
+        sd.group_participants("A first\ngroup", p1, p2, color=green_yellow_color)
         sd.group_participants("A second\ngroup", p3)
 
         p4 = sd.participant("Participant 4")
@@ -1039,7 +1136,7 @@ activate p5
         ).go_to(p5, "Message!")
 
         sd.group_participants("A third\ngroup", p4, p5)
-
+        print(sd)
         assert str(sd) == output
 
     @pytest.mark.parametrize(
@@ -1063,11 +1160,11 @@ deactivate p1
                 PlantUML,
                 """@startuml
 title: Empty Transitions between Participants
-participant "First" as p1
-participant "Second" as p2
-activate p1
+participant "First" as p1 
+participant "Second" as p2 
+activate p1 
 p1->p2: 
-activate p2
+activate p2 
 p2-->p1: 
 deactivate p2
 deactivate p1
@@ -1139,17 +1236,17 @@ deactivate p1
                 PlantUML,
                 """@startuml
 title: Participant types, according to ECB
-actor "Actor" as p1
-boundary "Boundary" as p2
-control "Control" as p3
-entity "Entity" as p4
-activate p1
+actor "Actor" as p1 #769D8F
+boundary "Boundary" as p2 
+control "Control" as p3 #769D8F
+entity "Entity" as p4 
+activate p1 
 p1->p2: Do something
-activate p2
+activate p2 
 p2->p3: Do something
-activate p3
+activate p3 
 p3->p4: Do something
-activate p4
+activate p4 
 p4-->p3: Return
 deactivate p4
 p3-->p2: Return
@@ -1164,9 +1261,16 @@ deactivate p1
                 D2,
                 """title: Participant types, according to ECB {
 shape: sequence_diagram
-p1: Actor {shape: person}
+p1: Actor {
+style: {fill: "#769D8F" 
+stroke:"#769D8F" }
+shape: person
+}
 p2: Boundary 
-p3: Control 
+p3: Control {
+style: {fill: "#769D8F" 
+stroke:"#769D8F" }
+}
 p4: Entity 
 p1.0 -> p2.1: Do something
 p2.1 -> p3.2: Do something
@@ -1180,9 +1284,9 @@ p2.1 -> p1.0: Return {style.stroke-dash: 3}
             (
                 SequenceDiagramOrg,
                 """title Participant types, according to ECB
-actor "Actor" as p1
+actor "Actor" as p1#769D8F
 boundary "Boundary" as p2
-control "Control" as p3
+control "Control" as p3#769D8F
 entity "Entity" as p4
 activate p1
 p1->p2: Do something
@@ -1204,9 +1308,9 @@ deactivate p1
     )
     def test_ecb_types_for_participants(self, generator_cls, output):
         sd = SequenceDiagram("Participant types, according to ECB", generator_cls)
-        actor = sd.participant("Actor").as_actor()
+        actor = sd.participant("Actor", color="769D8F").as_actor()
         boundary = sd.participant("Boundary").as_boundary()
-        control = sd.participant("Control").as_control()
+        control = sd.participant("Control", color="769D8F").as_control()
         entity = sd.participant("Entity").as_entity()
 
         actor.go_to(boundary, "Do something").go_to(control, "Do something").go_to(
@@ -1215,8 +1319,13 @@ deactivate p1
         entity.return_to(control, "Return").return_to(boundary, "Return").return_to(
             actor, "Return"
         )
-
+        print(sd)
         assert str(sd) == output
+
+    def test_invalid_color_string(self):
+        sd = SequenceDiagram("Invalid color", Mock)
+        with pytest.raises(AssertionError):
+            sd.participant("Invalid color", "red")
 
     def test_same_participants(self):
         sd = SequenceDiagram("Same participants", Mock)
