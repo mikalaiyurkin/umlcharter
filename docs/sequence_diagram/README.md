@@ -2,9 +2,9 @@
 
 ### Supported DSLs
 
-| Mermaid | PlantUML | D2 | SequenceDiagram.org |
-|---------|----------|----|---------------------|
-| ✅       | ✅        | ✅  | ✅                   |
+|                  | Mermaid                                                                                                                               | PlantUML         | D2                                                                                                           | SequenceDiagram.org        |
+|------------------|---------------------------------------------------------------------------------------------------------------------------------------|------------------|--------------------------------------------------------------------------------------------------------------|----------------------------|
+| Any limitations? | a) Styling not supported at all ([known issue](https://github.com/mermaid-js/mermaid/issues/523))<br/>b) Limited support of ECB types | ✅ No limitations | a) Limited styling support<br/>b) Limited support of ECB types<br/>c) Grouping of participants not supported | a) Limited styling support |
 
 For more details about the supported DSLs, please refer to the next links:
 
@@ -77,10 +77,10 @@ first = sd.participant("First")
 second = sd.participant("Second")
 ```
 
-We have chosen the `"Basic Example"` to be our title, chosen mermaid as a DSL to generate the diagram as a code and
+We have chosen the `"Basic Example"` to be our title, chosen `Mermaid` as a DSL to generate the diagram as a code and
 defined two participants of the scenario titled `"First"` and `"Second"`.
 
-Then we have defined the flow of interaction between the participants using 2 methods:
+Then we have defined the flow of interaction between the participants using two methods:
 
 - `go_to`
 - `return_to`
@@ -201,6 +201,13 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 | D2                  |         ![image](images/complex_d2.png)         |
 | SequenceDiagram.org | ![image](images/complex_sequencediagramorg.png) |
 
+### Styling
+
+It is possible to define the color of diagram elements
+to improve its readability or emphasize certain areas.
+Multiple functions and context managers support the positional argument
+`color` used to accept the hexadecimal code of the color that should be applied to the element.
+
 For more specific examples and extended functionality, please refer to the rest of the document:
 
 <details>
@@ -217,24 +224,25 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
         dsl,
         auto_activation=False,
     )
+    green_color = "769D8F"
     first = sd.participant("First")
-    second = sd.participant("Second")
+    second = sd.participant("Second", color=green_color)
 
     with first.activate():
         first.go_to(second, "Go to second")
-        with second.activate():
+        with second.activate(color=green_color):
             second.go_to(second, "Go to self")
             second.return_to(first, "Return to first")
 
     print(sd)
 ```
 
-| DSL                 |                       Visualization                       |
-|---------------------|:---------------------------------------------------------:|
-| Mermaid             |      ![image](images/manual_activation_mermaid.png)       |
-| PlantUML            |      ![image](images/manual_activation_plantuml.png)      |
-| D2                  |         ![image](images/manual_activation_d2.png)         |
-| SequenceDiagram.org | ![image](images/manual_activation_sequencediagramorg.png) |
+| DSL                 |                                                       Visualization                                                        |
+|---------------------|:--------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             |           ❌ Styling not supported at the moment of writing ❌<br/>![image](images/manual_activation_mermaid.png)            |
+| PlantUML            |                                      ![image](images/manual_activation_plantuml.png)                                       |
+| D2                  | ❌ Styling of the activation span is not supported at the moment of writing ❌<br/>![image](images/manual_activation_d2.png) |
+| SequenceDiagram.org |                                 ![image](images/manual_activation_sequencediagramorg.png)                                  |
 
 </details>
 
@@ -244,7 +252,7 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 Certain actions in the flow can be grouped to visually highlight the
 logical relations between the actions.
 
-To do that you have to use the context manager `group` called from the diagram instance
+To do that you have to use the context manager `group` called from the diagram instance.
 
 ```python
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOrg
@@ -258,19 +266,20 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 
     with sd.group("Group enclosing everything"):
         first.go_to(second, "Go to second")
-        with sd.group("Group enclosing interaction between second and third"):
+        green_color = "769D8F"
+        with sd.group("Group enclosing interaction between second and third", color=green_color):
             second.go_to(third, "Go to third").return_to(second, "Return to second")
         sd.return_("Return to first")
 
     print(sd)
 ```
 
-| DSL                 |                                                                        Visualization                                                                        |
-|---------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             | **NB!** Mermaid does not have a native "group" entity<br/>So the "group" is simulated using the colored rectangle<br/>![image](images/grouping_mermaid.png) |
-| PlantUML            |                                                           ![image](images/grouping_plantuml.png)                                                            |
-| D2                  |                                                              ![image](images/grouping_d2.png)                                                               |
-| SequenceDiagram.org |                                                      ![image](images/grouping_sequencediagramorg.png)                                                       |
+| DSL                 |                                                                                                        Visualization                                                                                                         |
+|---------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             | ❌ Styling not supported at the moment of writing ❌<br/>**NB!** Mermaid does not have a native "group" entity<br/>So the "group" is simulated using the colored rectangle with note<br/>![image](images/grouping_mermaid.png) |
+| PlantUML            |                                                                                            ![image](images/grouping_plantuml.png)                                                                                            |
+| D2                  |                                                                                               ![image](images/grouping_d2.png)                                                                                               |
+| SequenceDiagram.org |                                                                                       ![image](images/grouping_sequencediagramorg.png)                                                                                       |
 
 </details>
 
@@ -292,19 +301,20 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 
     with sd.loop("Infinite loop"):
         first.go_to(second, "Send request to second")
-        with sd.loop("Repeat until available"):
+        green_color = "769D8F"
+        with sd.loop("Repeat until available", color=green_color):
             second.go_to(second, "Check internal state")
         sd.return_("Return response")
 
     print(sd)
 ```
 
-| DSL                 |                                                                             Visualization                                                                              |
-|---------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             |                                                                   ![image](images/loop_mermaid.png)                                                                    |
-| PlantUML            |                                                                   ![image](images/loop_plantuml.png)                                                                   |
-| D2                  | **NB!** D2 does not have a native "loop" entity<br/>So the "loop" is simulated using the custom styling applied to the "group" entity<br/>![image](images/loop_d2.png) |
-| SequenceDiagram.org |                                                              ![image](images/loop_sequencediagramorg.png)                                                              |
+| DSL                 |                                                                                         Visualization                                                                                          |
+|---------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             |                                                    ❌ Styling not supported at the moment of writing ❌<br/>![image](images/loop_mermaid.png)                                                    |
+| PlantUML            |                                                                               ![image](images/loop_plantuml.png)                                                                               |
+| D2                  |                            **NB!** D2 does not have a native "loop" entity<br/>So the "loop" is simulated using the "group" entity<br/>![image](images/loop_d2.png)                            |
+| SequenceDiagram.org |                                                                          ![image](images/loop_sequencediagramorg.png)                                                                          |
 
 </details>
 
@@ -344,15 +354,33 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
                 with comedy.activate():
                     comedy.return_to(viewer, "Laugh a lot")
 
+    with viewer.activate():
+        viewer.go_to(viewer, "What would I like to watch tomorrow?")
+    
+    green_yellow_color = "b2b200"
+    green_color = "66b266"
+        
+    with sd.condition(color=green_yellow_color):
+        with sd.case("Want a drama"):
+            with viewer.activate():
+                viewer.go_to(drama, "Watch drama")
+                with drama.activate():
+                    drama.return_to(viewer, "Tears and sadness")
+        with sd.case("Want a comedy", color=green_color):
+            with viewer.activate():
+                viewer.go_to(comedy, "Watch comedy")
+                with comedy.activate():
+                    comedy.return_to(viewer, "Laugh a lot")
+
     print(sd)
 ```
 
-| DSL                 |                                                                               Visualization                                                                               |
-|---------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             |                                                                  ![image](images/condition_mermaid.png)                                                                   |
-| PlantUML            |                                                                  ![image](images/condition_plantuml.png)                                                                  |
-| D2                  | **NB!** D2 does not have a native "alt" entity<br/>So the "alt" is simulated using the custom styling applied to the "group" entity<br/>![image](images/condition_d2.png) |
-| SequenceDiagram.org |                                                             ![image](images/condition_sequencediagramorg.png)                                                             |
+| DSL                 |                                                                Visualization                                                                |
+|---------------------|:-------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             |                        ❌ Styling not supported at the moment of writing ❌<br/>![image](images/condition_mermaid.png)                        |
+| PlantUML            |                                                   ![image](images/condition_plantuml.png)                                                   |
+| D2                  | **NB!** D2 does not have a native "alt" entity<br/>So the "alt" is simulated using the "group" entity<br/>![image](images/condition_d2.png) |
+| SequenceDiagram.org |        ❌ Styling of the separate case not supported at the moment of writing ❌<br/>![image](images/condition_sequencediagramorg.png)        |
 
 </details>
 
@@ -376,18 +404,19 @@ for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
 
     sd.note("Batman is throwing\na batarang at the bandit")
     batman.go_to(bandit, "Pheeeeeeu!")
-    sd.note("Batman has missed!")
+    green_color = "769D8F"
+    sd.note("Batman has missed!", color=green_color)
     sd.return_("A bad day\nfor Gotham :(")
 
     print(sd)
 ```
 
-| DSL                 |                 Visualization                 |
-|---------------------|:---------------------------------------------:|
-| Mermaid             |      ![image](images/notes_mermaid.png)       |
-| PlantUML            |      ![image](images/notes_plantuml.png)      |
-| D2                  |         ![image](images/notes_d2.png)         |
-| SequenceDiagram.org | ![image](images/notes_sequencediagramorg.png) |
+| DSL                 |                                       Visualization                                       |
+|---------------------|:-----------------------------------------------------------------------------------------:|
+| Mermaid             | ❌ Styling not supported at the moment of writing ❌<br/>![image](images/notes_mermaid.png) |
+| PlantUML            |                            ![image](images/notes_plantuml.png)                            |
+| D2                  |      ❌ Styling not supported at the moment of writing ❌![image](images/notes_d2.png)      |
+| SequenceDiagram.org |                       ![image](images/notes_sequencediagramorg.png)                       |
 
 </details>
 
@@ -404,11 +433,16 @@ from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOr
 
 for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
     sd = SequenceDiagram("Groups of participants", dsl)
-    p1 = sd.participant("Participant 1")
-    p2 = sd.participant("Participant 2")
+
+    green_color = "769D8F"
+    another_green_color = "66b266"
+    green_yellow_color = "b2b200"
+    
+    p1 = sd.participant("Participant 1", color=green_color)
+    p2 = sd.participant("Participant 2", color=another_green_color)
     p3 = sd.participant("Participant 3")
 
-    sd.group_participants("A first\ngroup", p1, p2)  # one group defined here
+    sd.group_participants("A first\ngroup", p1, p2, color=green_yellow_color)  # one group defined here
 
     p4 = sd.participant("Participant 4")
     p5 = sd.participant("Participant 5")
@@ -430,48 +464,54 @@ _NB 2! You can group the participants that initially were not close to each othe
 the order of the participants within the groups can differ from the order defined initially.
 The order of participants in group has the higher priority then the order of participants defined initially_
 
-| DSL                 |                                                              Visualization                                                               |
-|---------------------|:----------------------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             |                                            ![image](images/participant_grouping_mermaid.png)                                             |
-| PlantUML            |                                            ![image](images/participant_grouping_plantuml.png)                                            |
+| DSL                 |                                                              Visualization                                                              |
+|---------------------|:---------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             |                   ❌ Styling not supported at the moment of writing ❌![image](images/participant_grouping_mermaid.png)                   |
+| PlantUML            |                                           ![image](images/participant_grouping_plantuml.png)                                            |
 | D2                  | ❌ Not supported at the moment of writing. For D2 the grouping logic will be ignored ❌<br/> ![image](images/participant_grouping_d2.png) |
-| SequenceDiagram.org |                                       ![image](images/participant_grouping_sequencediagramorg.png)                                       |
+| SequenceDiagram.org |                                      ![image](images/participant_grouping_sequencediagramorg.png)                                       |
 
 </details>
 
 <details>
 <summary><h3>ECB stereotypes for the participants</h3></summary>
 
-It is possible to define the alternative graphical stereotypes for the participants, 
-as from the [robustness diagram](https://en.wikipedia.org/wiki/Entity-control-boundary#Robustness_diagram) 
+It is possible to define the alternative graphical stereotypes for the participants,
+as from the [robustness diagram](https://en.wikipedia.org/wiki/Entity-control-boundary#Robustness_diagram)
 
 To mark the participant as "actor", "boundary", "control" or "entity", the special calls must be used accordingly:
 `as_actor()`, `as_boundary()`, `as_control` and `as_entity()`.
 
 Also, if these custom types are in use,
 the possibility to interact is limited according to the given type of the participant.
-For example, "actor" cannot interact directly with "entity" and vice versa. 
+For example, "actor" cannot interact directly with "entity" and vice versa.
 You can mix the participant defined in ECB with the participants without any specified types freely.
-The limitations of interaction between the participants are applied **only** to the participants with the explicitly set ECB type. 
+The limitations of interaction between the participants are applied **only** to the participants with the explicitly set
+ECB type.
+
 ```python
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOrg
 
 for dsl in (Mermaid, PlantUML, D2, SequenceDiagramOrg):
     sd = SequenceDiagram("Participant types, according to ECB", dsl)
-    actor = sd.participant("Actor").as_actor()
+    green_color = "769D8F"
+    another_green_color = "66b266"
+    actor = sd.participant("Actor", color=green_color).as_actor()
     boundary = sd.participant("Boundary").as_boundary()
     control = sd.participant("Control").as_control()
-    entity = sd.participant("Entity").as_entity()
+    entity = sd.participant("Entity", color=another_green_color).as_entity()
 
     actor.go_to(boundary, "Do something").go_to(control, "Do something").go_to(entity, "Do something")
     entity.return_to(control, "Return").return_to(boundary, "Return").return_to(actor, "Return")
-    
+
     print(sd)
 ```
-| DSL                 |                                                               Visualization                                                                |
-|---------------------|:------------------------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             |                       **NB!** Mermaid does not support all ECB types, only "actor" ![image](images/ecb_mermaid.png)                        |
-| PlantUML            |                                                     ![image](images/ecb_plantuml.png)                                                      |
-| D2                  | ❌ Not supported at the moment of writing. For D2 only "actor" can be simulated using the standard shape ❌<br/> ![image](images/ecb_d2.png) |
-| SequenceDiagram.org |                                                ![image](images/ecb_sequencediagramorg.png)                                                 |
+
+| DSL                 |                                                                       Visualization                                                                       |
+|---------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid             | ❌ Styling not supported at the moment of writing ❌<br/>**NB!** Mermaid does not support all ECB types, only "actor"<br/> ![image](images/ecb_mermaid.png) |
+| PlantUML            |                                                             ![image](images/ecb_plantuml.png)                                                             |
+| D2                  |            ❌ D2 does not support ECB types, only "actor" can be simulated using the standard shape "person" ❌<br/> ![image](images/ecb_d2.png)            |
+| SequenceDiagram.org |                                                        ![image](images/ecb_sequencediagramorg.png)                                                        |
+
 </details>

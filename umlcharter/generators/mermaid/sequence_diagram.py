@@ -1,9 +1,9 @@
-import itertools
 import typing
 
 from umlcharter.charts.sequence_diagram import (
     SequenceDiagram,
     SequenceDiagramParticipant,
+    SequenceDiagramParticipantGroup,
     Step,
     ParticipantActivationControl,
     ForwardStep,
@@ -30,7 +30,7 @@ class MermaidSequenceDiagram:
     @classmethod
     def generate(cls, sequence_diagram: SequenceDiagram) -> str:
         participants: typing.Dict[
-            typing.Optional[str], typing.List[SequenceDiagramParticipant]
+            SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: typing.List[
             Step
@@ -41,19 +41,6 @@ class MermaidSequenceDiagram:
         aliases = {}
         aliases_counter = 1
 
-        # iterate over the color groups, so the groups are not overlapping and separately visible
-        group_colors = itertools.cycle(
-            [
-                # some random colors I've picked
-                "rgb(121, 210, 166)",
-                "rgb(51, 153, 102)",
-                "rgb(153, 221, 255)",
-                "rgb(51, 187, 255)",
-                "rgb(0, 179, 179)",
-                "rgb(184, 184, 148)",
-            ]
-        )
-
         participant_types_map = {
             "default": "participant",
             "actor": "actor",
@@ -63,9 +50,9 @@ class MermaidSequenceDiagram:
         }
 
         generated = f"sequenceDiagram\nTitle: {cls._remove_line_breaks(sequence_diagram.title)}\n"
-        for group_title, group_participants in participants.items():
-            if group_title:
-                generated += f"box {cls._remove_line_breaks(group_title)}\n"
+        for group, group_participants in participants.items():
+            if group.title:
+                generated += f"box {cls._remove_line_breaks(group.title)}\n"
 
             for participant in group_participants:
                 # define initial last targeted participant
@@ -77,7 +64,7 @@ class MermaidSequenceDiagram:
 
                 generated += f"{participant_types_map[participant.type_]} {aliases[participant]} as {cls._line_break(participant.title)}\n"
 
-            if group_title:
+            if group.title:
                 generated += "end\n"
 
         for step in sequence:
@@ -99,7 +86,7 @@ class MermaidSequenceDiagram:
                 # NB: the Mermaid does not have the native "group" as Plant UML does, for example,
                 # so the reasonable workaround would be here creation of the background rectangle + some note
                 if step.is_active:
-                    generated += f"rect {next(group_colors)}\n"
+                    generated += f"rect rgb(230, 230, 240, 0.5)\n"
                     generated += f"note right of {aliases[last_targeted_participant]}: {cls._line_break(step.text)}\n"
                 else:
                     generated += "end\n"
