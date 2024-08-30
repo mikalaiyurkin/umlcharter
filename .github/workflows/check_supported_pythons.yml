@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Check if all the supported python versions are consistent
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
     - name: Install checker
       run: |
         python -m pip install --upgrade pip
