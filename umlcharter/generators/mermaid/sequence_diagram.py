@@ -32,9 +32,9 @@ class MermaidSequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[
-            Step
-        ] = sequence_diagram._SequenceDiagram__sequence  # noqa
+        sequence: typing.List[Step] = (
+            sequence_diagram._SequenceDiagram__sequence  # noqa
+        )
 
         first_case = False
         last_targeted_participant: SequenceDiagramParticipant | None = None
@@ -62,7 +62,10 @@ class MermaidSequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += f"{participant_types_map[participant.type_]} {aliases[participant]} as {cls._line_break(participant.title)}\n"
+                generated += (
+                    f"{participant_types_map[participant.type_]} {aliases[participant]} as "
+                    f"{cls._line_break(participant.title)}\n"
+                )
 
             if group.title:
                 generated += "end\n"
@@ -75,11 +78,17 @@ class MermaidSequenceDiagram:
                     generated += f"deactivate {aliases[step.participant]}\n"
 
             if isinstance(step, ForwardStep):
-                generated += f"{aliases[step.from_participant]}->>{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]}->>{aliases[step.to_participant]}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, ReturnStep):
-                generated += f"{aliases[step.from_participant]}-->>{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]}-->>{aliases[step.to_participant]}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, GroupControl):

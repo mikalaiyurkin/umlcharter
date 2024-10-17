@@ -32,9 +32,9 @@ class SequenceDiagramOrgSequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[
-            Step
-        ] = sequence_diagram._SequenceDiagram__sequence  # noqa
+        sequence: typing.List[Step] = (
+            sequence_diagram._SequenceDiagram__sequence  # noqa
+        )
 
         first_case = False
         last_targeted_participant: SequenceDiagramParticipant | None = None
@@ -52,7 +52,10 @@ class SequenceDiagramOrgSequenceDiagram:
         generated = f"title {cls._line_break(sequence_diagram.title)}\n"
         for group, group_participants in participants.items():
             if group.title:
-                generated += f"participantgroup{group.color.as_hex() if group.color else ''} **{cls._line_break(group.title)}**\n"
+                generated += (
+                    f"participantgroup{group.color.as_hex() if group.color else ''} "
+                    f"**{cls._line_break(group.title)}**\n"
+                )
 
             for participant in group_participants:
                 # define initial last targeted participant
@@ -62,7 +65,10 @@ class SequenceDiagramOrgSequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += f'{participant_types_map[participant.type_]} "{cls._line_break(participant.title)}" as {aliases[participant]}'
+                generated += (
+                    f'{participant_types_map[participant.type_]} "{cls._line_break(participant.title)}" as '
+                    f"{aliases[participant]}"
+                )
                 generated += (
                     f"{participant.color.as_hex() if participant.color else ''}\n"
                 )
@@ -78,22 +84,34 @@ class SequenceDiagramOrgSequenceDiagram:
                     generated += f"deactivate {aliases[step.participant]}\n"
 
             if isinstance(step, ForwardStep):
-                generated += f"{aliases[step.from_participant]}->{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]}->{aliases[step.to_participant]}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, ReturnStep):
-                generated += f"{aliases[step.from_participant]}-->{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]}-->{aliases[step.to_participant]}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, GroupControl):
                 if step.is_active:
-                    generated += f"group{step.color.as_hex() if step.color else ''} [{cls._remove_line_breaks(step.text)}]\n"
+                    generated += (
+                        f"group{step.color.as_hex() if step.color else ''} "
+                        f"[{cls._remove_line_breaks(step.text)}]\n"
+                    )
                 else:
                     generated += "end\n"
 
             if isinstance(step, LoopControl):
                 if step.is_active:
-                    generated += f"loop{step.color.as_hex() if step.color else ''} {cls._remove_line_breaks(step.how_many_iterations)}\n"
+                    generated += (
+                        f"loop{step.color.as_hex() if step.color else ''} "
+                        f"{cls._remove_line_breaks(step.how_many_iterations)}\n"
+                    )
                 else:
                     generated += "end\n"
 
@@ -114,6 +132,9 @@ class SequenceDiagramOrgSequenceDiagram:
                         generated += f"else {cls._remove_line_breaks(step.text)}\n"
 
             if isinstance(step, NoteStep):
-                generated += f"note right of {aliases[last_targeted_participant]}{step.color.as_hex() if step.color else ''}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"note right of {aliases[last_targeted_participant]}{step.color.as_hex() if step.color else ''}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
 
         return generated

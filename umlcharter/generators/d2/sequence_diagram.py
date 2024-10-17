@@ -27,9 +27,9 @@ class D2SequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[
-            Step
-        ] = sequence_diagram._SequenceDiagram__sequence  # noqa
+        sequence: typing.List[Step] = (
+            sequence_diagram._SequenceDiagram__sequence  # noqa
+        )
 
         last_targeted_participant: SequenceDiagramParticipant | None = None
         aliases = {}
@@ -59,7 +59,10 @@ class D2SequenceDiagram:
                 if participant.color or participant_types_map[participant.type_]:
                     generated += "{\n"
                     if participant.color:
-                        generated += f'style: {{fill: "{participant.color.as_hex()}" \nstroke:"{participant.color.as_hex()}" }}\n'
+                        generated += (
+                            f'style: {{fill: "{participant.color.as_hex()}" \n'
+                            f'stroke:"{participant.color.as_hex()}" }}\n'
+                        )
                     if participant_types_map[participant.type_]:
                         generated += (
                             f"shape: {participant_types_map[participant.type_]}\n"
@@ -99,11 +102,17 @@ class D2SequenceDiagram:
                     )
 
             if isinstance(step, ForwardStep):
-                generated += f"{aliases[step.from_participant]} -> {aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]} -> "
+                    f"{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, ReturnStep):
-                generated += f"{aliases[step.from_participant]} -> {aliases[step.to_participant]}: {cls._line_break(step.text)} {{style.stroke-dash: 3}}\n"
+                generated += (
+                    f"{aliases[step.from_participant]} -> "
+                    f"{aliases[step.to_participant]}: {cls._line_break(step.text)} {{style.stroke-dash: 3}}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, NoteStep):
