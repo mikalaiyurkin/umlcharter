@@ -27,9 +27,9 @@ class PlantUMLSequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[
-            Step
-        ] = sequence_diagram._SequenceDiagram__sequence  # noqa
+        sequence: typing.List[Step] = (
+            sequence_diagram._SequenceDiagram__sequence  # noqa
+        )
 
         first_case = False
         deactivation_just_has_happened_for_step: SequenceDiagramParticipant | None = (
@@ -60,7 +60,10 @@ class PlantUMLSequenceDiagram:
                 aliases[participant] = f"p{aliases_counter}"
                 aliases_counter += 1
 
-                generated += f"{participant_types_map[participant.type_]} \"{cls._line_break(participant.title)}\" as {aliases[participant]} {participant.color.as_hex() if participant.color else ''}\n"
+                generated += (
+                    f'{participant_types_map[participant.type_]} "{cls._line_break(participant.title)}" as '
+                    f"{aliases[participant]} {participant.color.as_hex() if participant.color else ''}\n"
+                )
 
             if group.title:
                 generated += "end box\n"
@@ -84,22 +87,34 @@ class PlantUMLSequenceDiagram:
                     deactivation_just_has_happened_for_step = step.participant
 
             if isinstance(step, ForwardStep):
-                generated += f"{aliases[step.from_participant]}->{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]}->{aliases[step.to_participant]}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, ReturnStep):
-                generated += f"{aliases[step.from_participant]}-->{aliases[step.to_participant]}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"{aliases[step.from_participant]}-->{aliases[step.to_participant]}: "
+                    f"{cls._line_break(step.text)}\n"
+                )
                 last_targeted_participant = step.to_participant
 
             if isinstance(step, GroupControl):
                 if step.is_active:
-                    generated += f"group{step.color.as_hex() if step.color else ''} {step.color.as_hex() if step.color else ''} {cls._line_break(step.text)}\n"
+                    generated += (
+                        f"group{step.color.as_hex() if step.color else ''} "
+                        f"{step.color.as_hex() if step.color else ''} {cls._line_break(step.text)}\n"
+                    )
                 else:
                     generated += "end\n"
 
             if isinstance(step, LoopControl):
                 if step.is_active:
-                    generated += f"loop{step.color.as_hex() if step.color else ''} {step.color.as_hex() if step.color else ''} {cls._line_break(step.how_many_iterations)}\n"
+                    generated += (
+                        f"loop{step.color.as_hex() if step.color else ''} "
+                        f"{step.color.as_hex() if step.color else ''} {cls._line_break(step.how_many_iterations)}\n"
+                    )
                 else:
                     generated += "end\n"
 
@@ -114,12 +129,21 @@ class PlantUMLSequenceDiagram:
             if isinstance(step, CaseControl):
                 if step.is_active:
                     if first_case:
-                        generated += f" {step.color.as_hex() if step.color else '#FFFFFF'} {cls._line_break(step.text)}\n"
+                        generated += (
+                            f" {step.color.as_hex() if step.color else '#FFFFFF'} "
+                            f"{cls._line_break(step.text)}\n"
+                        )
                         first_case = False
                     else:
-                        generated += f"else {step.color.as_hex() if step.color else '#FFFFFF'} {cls._line_break(step.text)}\n"
+                        generated += (
+                            f"else {step.color.as_hex() if step.color else '#FFFFFF'} "
+                            f"{cls._line_break(step.text)}\n"
+                        )
 
             if isinstance(step, NoteStep):
-                generated += f"note right of {aliases[last_targeted_participant]} {step.color.as_hex() if step.color else ''}: {cls._line_break(step.text)}\n"
+                generated += (
+                    f"note right of {aliases[last_targeted_participant]} "
+                    f"{step.color.as_hex() if step.color else ''}: {cls._line_break(step.text)}\n"
+                )
 
         return generated + "@enduml\n"

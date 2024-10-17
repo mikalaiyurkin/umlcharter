@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOrg
+from umlcharter.charts.types import ChartingException
 
 
 class TestSequenceDiagram:
@@ -1324,14 +1325,14 @@ deactivate p1
 
     def test_invalid_color_string(self):
         sd = SequenceDiagram("Invalid color", Mock)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.participant("Invalid color", "red")
 
     def test_same_participants(self):
         sd = SequenceDiagram("Same participants", Mock)
 
         sd.participant("Same")
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.participant(
                 "Same"
             )  # it is forbidden to have multiple participants with the same label
@@ -1345,13 +1346,13 @@ deactivate p1
         second = sd.participant("Second")
 
         first.go_to(second)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.return_()
 
     def test_forbid_return_to_nowhere(self):
         sd = SequenceDiagram("Return to nowhere", Mock)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.return_()
 
     def test_force_case_after_condition(self):
@@ -1359,14 +1360,14 @@ deactivate p1
         first = sd.participant("First")
         second = sd.participant("Second")
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             with sd.condition():
                 first.go_to(second, "Do smth")
 
     def test_force_case_inside_condition(self):
         sd = SequenceDiagram("Violated order of condition and case #2", Mock)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             with sd.case("A case"):
                 pass
 
@@ -1378,7 +1379,7 @@ deactivate p1
 
         a = sd.participant("Someone")
         a.type_ = "SET TO SOMETHING ELSE BUT NOT DEFAULT"
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             getattr(a, callable_)()
 
     @pytest.mark.parametrize(
@@ -1403,7 +1404,7 @@ deactivate p1
         a.type_ = from_
         b.type_ = to_
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             a.go_to(b, "Do something")
 
     @pytest.mark.parametrize(
@@ -1428,7 +1429,7 @@ deactivate p1
         a.type_ = from_
         b.type_ = to_
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             a.return_to(b, "Do something")
 
     @pytest.mark.parametrize("title", (None, ""))
@@ -1438,7 +1439,7 @@ deactivate p1
         )
         first = sd.participant("First")
         second = sd.participant("Second")
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.group_participants(title, first, second)
 
     def test_cannot_use_same_group_names_multiple_times(self):
@@ -1449,7 +1450,7 @@ deactivate p1
         second = sd.participant("Second")
         group_title = Mock()
         sd.group_participants(group_title, first)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.group_participants(group_title, second)
 
     def test_cannot_put_same_participant_to_different_groups(self):
@@ -1461,5 +1462,5 @@ deactivate p1
         group_title_1 = Mock()
         group_title_2 = Mock()
         sd.group_participants(group_title_1, first)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ChartingException):
             sd.group_participants(group_title_2, first)

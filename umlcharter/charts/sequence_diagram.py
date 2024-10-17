@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from itertools import chain
 
-from umlcharter.charts.types import BaseChart, Color
+from umlcharter.charts.types import BaseChart, Color, ChartingException
 from umlcharter.generators.base import IChartGenerator
 
 
@@ -83,7 +83,7 @@ class SequenceDiagramParticipant(Colored):
 
     def __check_can_set_type(self):
         if self.type_ != "default":
-            raise AssertionError(
+            raise ChartingException(
                 f"The type of the participant must be set only once. The current type is '{self.type_}'"
             )
 
@@ -141,7 +141,7 @@ class SequenceDiagramParticipant(Colored):
         )
 
         if {self.type_, to.type_} not in allowed:
-            raise AssertionError(
+            raise ChartingException(
                 f"The interaction between '{self.type_}' to '{to.type_}' is not allowed. "
                 f"Please correct the types of the participants or remove the use of the types "
                 f"if you do not really care about it."
@@ -207,7 +207,7 @@ class SequenceDiagram(BaseChart):
     A sequence of the steps that must be rendered to the diagram DSL - depending on the chosen renderer.
 
     :title: The title of the diagram to display on the top of the diagram
-    :renderer_cls: the class of the renderer to be used to generate the diagram
+    :generator_cls: the class of the renderer to be used to generate the diagram
     :auto_activation: The flag used to track whether the participant should be activated every time it
         has evoked the action to another participant.
         Once the control flow has returned back and the initial active participant was the target of the action, the
@@ -249,7 +249,7 @@ class SequenceDiagram(BaseChart):
             _.title for _ in chain.from_iterable(self.__participants.values())
         ]
         if title in all_registered_participant_titles:
-            raise AssertionError(
+            raise ChartingException(
                 f"Sequence diagram already contains participant {title}. "
                 f"All participants must have unique titles."
             )
@@ -269,21 +269,21 @@ class SequenceDiagram(BaseChart):
         color: typing.Optional[str] = None,
     ) -> None:
         """
-        Visually join (group, encompass, box) participants to emphasize the connections or similarities between them
+        Visually join (group, encompass, box) participants to emphasize the connections or similarities between them.
 
         NB 1: the name of this new group must be unique.
         NB 2: every participant can participate in one group only
         """
         all_registered_groups = [_.title for _ in self.__participants]
         if not title or title in all_registered_groups:
-            raise AssertionError(
+            raise ChartingException(
                 "The given name of the named group of joint participants "
                 "must be unique and not empty."
             )
 
         for participant in participants:
             if participant not in self.__participants.get(self.__default_group, []):
-                raise AssertionError(
+                raise ChartingException(
                     f"The participant {participant.title} does not belong to the default group "
                     "and therefor cannot be moved to the named one."
                 )
@@ -304,7 +304,7 @@ class SequenceDiagram(BaseChart):
 
     def note(self, text: str, color: typing.Optional[str] = None) -> None:
         """
-        Add the note plate with the iven text somewhere inside the diagram
+        Add the note plate with the given text somewhere inside the diagram
         """
         self.__add_step(NoteStep(text=text, _color=color))
 
@@ -325,7 +325,7 @@ class SequenceDiagram(BaseChart):
 
     def return_(self, text: str = ""):
         if not self.auto_activation:
-            raise AssertionError(
+            raise ChartingException(
                 "The method .return_() can be used only when diagram have been initialized"
                 "with `auto_activation=True`. "
                 "Please initialize the diagram with `auto_activation=True` "
@@ -334,7 +334,7 @@ class SequenceDiagram(BaseChart):
         try:
             previously_active_participant = self.__auto_activation_stack[-1]
         except IndexError:
-            raise AssertionError(
+            raise ChartingException(
                 "Sequence diagram stack does not hold the previous participant to return to."
             )
         self.__add_step(
@@ -380,15 +380,15 @@ class SequenceDiagram(BaseChart):
             previous_step = self.__sequence[-1]
             if isinstance(previous_step, ConditionControl) and previous_step.is_active:
                 if not isinstance(step, CaseControl):
-                    raise AssertionError(
+                    raise ChartingException(
                         "After `with .condition()` the next step must be always `with .case()` "
                         "with the definition of the condition. "
                         "Please check the examples from the project repo."
                     )
         else:
-            # do not allow "CaseControl" being used outside of the condition
+            # do not allow "CaseControl" being used outside the condition
             if isinstance(step, CaseControl):
-                raise AssertionError(
+                raise ChartingException(
                     "Context manager `with .case()` cannot be used separately outside of the "
                     "`with .condition()` context manager. "
                     "Please check the examples from the project repo."
