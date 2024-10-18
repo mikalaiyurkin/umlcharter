@@ -4,7 +4,7 @@ from .generators.plantuml.plantuml import PlantUML
 from .generators.d2.d2 import D2
 from .generators.sequencediagramorg.sequencediagramorg import SequenceDiagramOrg
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 __all__ = (
     # charts
