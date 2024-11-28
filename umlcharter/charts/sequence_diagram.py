@@ -1,4 +1,5 @@
 import typing
+from collections import Counter
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from itertools import chain
@@ -374,6 +375,17 @@ class SequenceDiagram(BaseChart):
         yield
         self.__add_step(CaseControl(is_active=False, _color=color))
 
+    def __active_participants(self) -> typing.List[SequenceDiagramParticipant]:
+        """
+        If the number of activation `ParticipantActivationControl` associated with the registered participant
+        is above of the number of deactivation ones, then the participant is active
+        """
+        c = Counter()
+        for step in self.__sequence:
+            if isinstance(step, ParticipantActivationControl):
+                c[step.participant] += (1 if step.is_active else -1)
+        return list(+c)
+
     def __add_step(self, step: Step):
         if self.__inside_condition:
             # explicitly require the "CaseControl" to always happen right after the "ConditionControl"
@@ -401,6 +413,19 @@ class SequenceDiagram(BaseChart):
             # And every time the flow returns to the previously activated participant, its activation must be ended.
 
             if isinstance(step, ForwardStep):
+
+                if step.to_participant is step.from_participant:
+                    # Self-targeting is a special case for the auto-activated sequence diagram, because it must activate
+                    # self and deactivate self right after the call.
+                    # Also, for simplicity of auto-activation interpretation, the participant must not be activated if
+                    # it is already activated
+                    if step.to_participant in self.__active_participants():
+                        self.__sequence.append(step)
+                    else:
+                        with step.to_participant.activate():
+                            self.__sequence.append(step)
+                    return
+
                 if not self.__auto_activation_stack:
                     # If stack is empty, the very first participant starting the flow must be activated as well.
                     self.__auto_activation_stack.append((None, step.from_participant))
