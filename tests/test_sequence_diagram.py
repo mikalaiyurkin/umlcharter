@@ -376,6 +376,106 @@ deactivate p1
             (
                 Mermaid,
                 """sequenceDiagram
+Title: Self-targeting
+participant p1 as A
+participant p2 as B
+activate p1
+p1->>p1: Self-targeting at the beginning
+deactivate p1
+activate p1
+p1->>p2: 
+activate p2
+p1->>p1: Self-targeting while flow under control of other participant
+p2->>p2: Self-targeting while being active
+p2-->>p1: 
+deactivate p2
+deactivate p1
+activate p1
+p1->>p1: Self-targeting at the end
+deactivate p1
+"""
+            ),
+            (
+                PlantUML,
+                """@startuml
+title: Self-targeting
+participant "A" as p1 
+participant "B" as p2 
+activate p1 
+p1->p1: Self-targeting at the beginning
+deactivate p1
+p1 -[hidden]-> p1
+activate p1 
+p1->p2: 
+activate p2 
+p1->p1: Self-targeting while flow under control of other participant
+p2->p2: Self-targeting while being active
+p2-->p1: 
+deactivate p2
+deactivate p1
+p1 -[hidden]-> p1
+activate p1 
+p1->p1: Self-targeting at the end
+deactivate p1
+@enduml
+"""
+            ),
+            (
+                D2,
+                """title: Self-targeting {
+shape: sequence_diagram
+p1: A 
+p2: B 
+p1.0 -> p1.0: Self-targeting at the beginning
+p1.1 -> p2.2: ''
+p1.1 -> p1.1: Self-targeting while flow under control of other participant
+p2.2 -> p2.2: Self-targeting while being active
+p2.2 -> p1.1: '' {style.stroke-dash: 3}
+p1.3 -> p1.3: Self-targeting at the end
+}
+"""
+            ),
+            (
+                SequenceDiagramOrg,
+                """title Self-targeting
+participant "A" as p1
+participant "B" as p2
+activate p1
+p1->p1: Self-targeting at the beginning
+deactivate p1
+activate p1
+p1->p2: 
+activate p2
+p1->p1: Self-targeting while flow under control of other participant
+p2->p2: Self-targeting while being active
+p2-->p1: 
+deactivate p2
+deactivate p1
+activate p1
+p1->p1: Self-targeting at the end
+deactivate p1
+"""
+            )
+        )
+    )
+    def test_self_targeting_with_auto_activation(self, generator_cls, output):
+        sd = SequenceDiagram("Self-targeting", generator_cls, auto_activation=True)
+        a = sd.participant("A")
+        b = sd.participant("B")
+        a.go_to(a, "Self-targeting at the beginning")
+        a.go_to(b)
+        a.go_to(a, "Self-targeting while flow under control of other participant")
+        b.go_to(b, "Self-targeting while being active")
+        b.return_to(a)
+        a.go_to(a, "Self-targeting at the end")
+        assert str(sd) == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+            (
+                Mermaid,
+                """sequenceDiagram
 Title: Diagram Interaction and Grouping
 participant p1 as First
 participant p2 as Second
