@@ -32,9 +32,7 @@ class SequenceDiagramOrgSequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[Step] = (
-            sequence_diagram._SequenceDiagram__sequence  # noqa
-        )
+        sequence: typing.List[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
         first_case = False
         last_targeted_participant: SequenceDiagramParticipant | None = None

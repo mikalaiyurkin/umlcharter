@@ -17,6 +17,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/mikalaiyurkin/charter",
     packages=setuptools.find_packages(exclude=("tests",)),
+    extras_require={"dev": ["pytest", "pytest-cov", "pre-commit"]},
     python_requires=">=3.8",
     classifiers=[
         "Programming Language :: Python :: 3",
