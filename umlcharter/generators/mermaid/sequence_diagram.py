@@ -32,9 +32,7 @@ class MermaidSequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[Step] = (
-            sequence_diagram._SequenceDiagram__sequence  # noqa
-        )
+        sequence: typing.List[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
         first_case = False
         last_targeted_participant: SequenceDiagramParticipant | None = None
@@ -95,7 +93,7 @@ class MermaidSequenceDiagram:
                 # NB: the Mermaid does not have the native "group" as Plant UML does, for example,
                 # so the reasonable workaround would be here creation of the background rectangle + some note
                 if step.is_active:
-                    generated += f"rect rgb(230, 230, 240, 0.5)\n"
+                    generated += "rect rgb(230, 230, 240, 0.5)\n"
                     generated += f"note right of {aliases[last_targeted_participant]}: {cls._line_break(step.text)}\n"
                 else:
                     generated += "end\n"

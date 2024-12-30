@@ -27,9 +27,7 @@ class PlantUMLSequenceDiagram:
         participants: typing.Dict[
             SequenceDiagramParticipantGroup, typing.List[SequenceDiagramParticipant]
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
-        sequence: typing.List[Step] = (
-            sequence_diagram._SequenceDiagram__sequence  # noqa
-        )
+        sequence: typing.List[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
         first_case = False
         deactivation_just_has_happened_for_step: SequenceDiagramParticipant | None = (
