@@ -3,5 +3,6 @@ repos:
   rev: v0.8.4
   hooks:
     - id: ruff
-      args: [ --fix ]
+      args: ["--fix", "--target-version", "py312"]
     - id: ruff-format
+      args: ["--target-version", "py312"]
