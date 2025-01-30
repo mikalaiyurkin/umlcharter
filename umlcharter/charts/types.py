@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+import typing
+from dataclasses import dataclass, field
 
 
 class ChartingException(Exception):
@@ -26,6 +27,19 @@ class Color:
 
     def as_hex(self) -> str:
         return f"#{self.color}"
+
+
+@dataclass
+class Colored:
+    """
+    Used to assign the color to the component of the diagram.
+    """
+
+    _color: typing.Optional[str]
+    color: typing.Optional[Color] = field(init=False)
+
+    def __post_init__(self):
+        self.color = Color(self._color) if self._color else None
 
 
 class BaseChart:

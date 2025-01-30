@@ -4,21 +4,8 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from itertools import chain
 
-from umlcharter.charts.types import BaseChart, Color, ChartingException
+from umlcharter.charts.types import BaseChart, ChartingException, Colored
 from umlcharter.generators.base import IChartGenerator
-
-
-@dataclass
-class Colored:
-    """
-    Used to assign the color to the component of the sequence diagram.
-    """
-
-    _color: typing.Optional[str]
-    color: typing.Optional[Color] = field(init=False)
-
-    def __post_init__(self):
-        self.color = Color(self._color) if self._color else None
 
 
 class Step:
