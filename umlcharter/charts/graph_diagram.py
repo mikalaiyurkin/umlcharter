@@ -1,90 +1,150 @@
 import typing
 from dataclasses import dataclass, field
 
-from umlcharter.charts.types import BaseChart, Colored, ChartingException
+from umlcharter.charts.common import BaseChart, Colored, ChartingException
 from umlcharter.generators.base import IChartGenerator
 
 
+@dataclass
 class BaseNode:
-    graph_ref: typing.Optional["GraphNodeGroup"]
+    _graph_ref: typing.Optional["Group"]
 
-    def __init__(self, graph_ref: typing.Optional["GraphNodeGroup"]):
-        self.graph_ref = graph_ref
+    @property
+    def __graph_belongs_to(
+        self,
+    ) -> typing.Dict["BaseNode", typing.List[typing.Tuple["BaseNode", str]]]:
+        return self._graph_ref._Group__inner_graph  # noqa
 
-    def __hash__(self):
-        return hash(id(self))
-
-    def __graph_belongs_to(self) -> typing.Dict["BaseNode", typing.List[typing.Tuple["BaseNode", str]]]:
-        return self.graph_ref._GraphNodeGroup__inner_graph  # noqa
-
-    def __check_if_interaction_is_possible(self, to: "BaseNode"):
+    def __check_if_interaction_is_allowed(self, to: "BaseNode"):
         if to not in self.__graph_belongs_to:
-            raise ChartingException("The interaction between the nodes is allowed only within the same group. ")
+            raise ChartingException(
+                "The interaction between the nodes is allowed only within the same group. "
+            )
 
-        if to in [_[0] for _ in self.__graph_belongs_to[to]]:
-            raise ChartingException("There is already an established route between these nodes.")
+        if to in [_[0] for _ in self.__graph_belongs_to[self]]:
+            raise ChartingException(
+                f"There is already an established route from {self} to {to}."
+            )
 
     def go_to(self, to: "BaseNode", text: str = "") -> "BaseNode":
-        self.__check_if_interaction_is_possible(to)
-        self.__graph_belongs_to[to].append((to, text))
+        self.__check_if_interaction_is_allowed(to)
+        self.__graph_belongs_to[self].append((to, text))
         return to
 
 
 @dataclass
 class Fork(BaseNode):
-    pass
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return "Fork"  # pragma: nocover
 
 
 @dataclass
 class Join(BaseNode):
-    pass
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return "Join"  # pragma: nocover
 
 
 @dataclass
-class GraphNodeStart(BaseNode):
-    pass
+class Condition(BaseNode, Colored):
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return "Condition"  # pragma: nocover
 
 
 @dataclass
-class GraphNodeFinish(BaseNode):
-    pass
+class Start(BaseNode):
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return "Start"  # pragma: nocover
 
 
 @dataclass
-class GraphNode(Colored, BaseNode):
+class Finish(BaseNode):
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return "Finish"  # pragma: nocover
+
+
+@dataclass
+class Node(BaseNode, Colored):
     text: str
 
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return f"Node {self.text}"  # pragma: nocover
 
 
-class GraphNodeGroup(BaseNode):
+@dataclass
+class Group(BaseNode, Colored):
     text: str
-    start: GraphNodeStart
-    finish: GraphNodeFinish
-    __inner_graph: typing.Dict[BaseNode, typing.List[typing.Tuple[BaseNode, str]]] = field(init=False)
+    start: Start = field(init=False)
+    finish: Finish = field(init=False)
+    __inner_graph: typing.Dict[BaseNode, typing.List[typing.Tuple[BaseNode, str]]] = (
+        field(init=False)
+    )
+
+    def __hash__(self):
+        return hash(f"{id(self)}")
+
+    def __repr__(self):
+        return f"Group {self.text}"  # pragma: nocover
 
     def __post_init__(self):
         super().__post_init__()
-        self.start = GraphNodeStart(graph_ref=self)
-        self.finish = GraphNodeFinish(graph_ref=self)
-        # print(self.start)
-        # print(self.finish)
-        # self.__inner_graph = {
-        #     self.start: [],
-        #     self.finish: [],
-        # }
+        self.start = Start(_graph_ref=self)
+        self.finish = Finish(_graph_ref=self)
+        self.__inner_graph = {
+            self.start: [],
+            self.finish: [],
+        }
 
-    def node(self, title: str, color: typing.Optional[str] = None) -> GraphNode:
-        node = GraphNode(graph_ref=self, text=title, _color=color)
+    def __check_if_adding_new_element_is_allowed(self, title: str):
+        for nodes in self.__inner_graph:
+            if getattr(nodes, "title", None) == title:
+                raise ChartingException(
+                    "There must be no nodes in the graph in the same group with the same title."
+                )
+
+    def node(self, title: str, color: typing.Optional[str] = None) -> Node:
+        self.__check_if_adding_new_element_is_allowed(title)
+        node = Node(_graph_ref=self, text=title, _color=color)
         self.__inner_graph[node] = []
         return node
 
-    def group(self, title: str, color: typing.Optional[str] = None) -> "GraphNodeGroup":
-        group = GraphNodeGroup(graph_ref=self, text=title, _color=color)
+    def group(self, title: str, color: typing.Optional[str] = None) -> "Group":
+        self.__check_if_adding_new_element_is_allowed(title)
+        group = Group(_graph_ref=self, text=title, _color=color)
         self.__inner_graph[group] = []
         return group
 
-    # def __validate_inner_graph(self):
-    #     pass # TODO
+    def fork(self) -> "Fork":
+        fork = Fork(_graph_ref=self)
+        self.__inner_graph[fork] = []
+        return fork
+
+    def join(self) -> "Join":
+        join = Join(_graph_ref=self)
+        self.__inner_graph[join] = []
+        return join
+
+    def condition(self, color: typing.Optional[str] = None) -> "Condition":
+        condition = Condition(_graph_ref=self, _color=color)
+        self.__inner_graph[condition] = []
+        return condition
 
 
 @dataclass
@@ -105,19 +165,48 @@ class GraphDiagram(BaseChart):
     is_vertical: bool = True
 
     __generator: IChartGenerator = field(init=False)
-    __default_group: GraphNodeGroup = field(init=False)
+    __default_group: Group = field(init=False)
 
     def __post_init__(self):
         self.__generator = self.generator_cls(self)
-        self.__default_group = GraphNodeGroup(graph_ref=None, text=None, _color=None)
+        self.__default_group = Group(_graph_ref=None, text="", _color=None)
 
-    def node(self, title: str, color: typing.Optional[str] = None) -> GraphNode:
+    @property
+    def start(self) -> Start:
+        return self.__default_group.start
+
+    @property
+    def finish(self) -> Finish:
+        return self.__default_group.finish
+
+    def node(self, title: str, color: typing.Optional[str] = None) -> Node:
         return self.__default_group.node(title, color)
 
-    def group(self, title: str, color: typing.Optional[str] = None) -> GraphNodeGroup:
+    def group(self, title: str, color: typing.Optional[str] = None) -> Group:
         return self.__default_group.group(title, color)
 
+    def fork(self) -> Fork:
+        return self.__default_group.fork()
 
-if __name__ == '__main__':
+    def join(self) -> Join:
+        return self.__default_group.join()
+
+    def condition(self, color: typing.Optional[str] = None) -> Condition:
+        return self.__default_group.condition(color)
+
+    def generate(self) -> str:
+        return self.__generator.generate_graph_diagram()
+
+    def __repr__(self):
+        return f"'{self.title}', {self.generator_cls.__name__}"  # pragma: nocover
+
+    def __str__(self):
+        return self.generate()
+
+
+if __name__ == "__main__":
     x = GraphDiagram("aaa", type)
-    x.node("")
+    n1 = x.node("1")
+    n2 = x.node("2")
+    n1.go_to(n2, "Hello")
+    print(n1)

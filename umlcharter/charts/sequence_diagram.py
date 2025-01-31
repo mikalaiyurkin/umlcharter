@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from itertools import chain
 
-from umlcharter.charts.types import BaseChart, ChartingException, Colored
+from umlcharter.charts.common import BaseChart, ChartingException, Colored
 from umlcharter.generators.base import IChartGenerator
 
 
@@ -370,7 +370,7 @@ class SequenceDiagram(BaseChart):
         c = Counter()
         for step in self.__sequence:
             if isinstance(step, ParticipantActivationControl):
-                c[step.participant] += (1 if step.is_active else -1)
+                c[step.participant] += 1 if step.is_active else -1
         return list(+c)
 
     def __add_step(self, step: Step):
@@ -400,7 +400,6 @@ class SequenceDiagram(BaseChart):
             # And every time the flow returns to the previously activated participant, its activation must be ended.
 
             if isinstance(step, ForwardStep):
-
                 if step.to_participant is step.from_participant:
                     # Self-targeting is a special case for the auto-activated sequence diagram, because it must activate
                     # self and deactivate self right after the call.

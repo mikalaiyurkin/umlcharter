@@ -30,7 +30,18 @@ class Color:
 
 
 @dataclass
-class Colored:
+class __InheritableDataclassAllowingSuperPostInit:
+    """
+    Just a simple dataclass defining a useless __post_init__ in order to satisfy python's MRO and allow inherited
+    dataclasses with custom __post_init__'s
+    """
+
+    def __post_init__(self):
+        pass
+
+
+@dataclass
+class Colored(__InheritableDataclassAllowingSuperPostInit):
     """
     Used to assign the color to the component of the diagram.
     """
@@ -39,6 +50,7 @@ class Colored:
     color: typing.Optional[Color] = field(init=False)
 
     def __post_init__(self):
+        super().__post_init__()
         self.color = Color(self._color) if self._color else None
 
 
