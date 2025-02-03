@@ -7,23 +7,39 @@ from umlcharter.generators.base import IChartGenerator
 
 @dataclass
 class BaseNode:
-    _graph_ref: typing.Optional["Group"]
+    _graph_ref: typing.Optional["Node"]
 
     @property
     def __graph_belongs_to(
         self,
     ) -> typing.Dict["BaseNode", typing.List[typing.Tuple["BaseNode", str]]]:
-        return self._graph_ref._Group__inner_graph  # noqa
+        return self._graph_ref._Node__inner_graph  # noqa
 
     def __check_if_interaction_is_allowed(self, to: "BaseNode"):
         if to not in self.__graph_belongs_to:
             raise ChartingException(
-                "The interaction between the nodes is allowed only within the same group. "
+                "You cannot define a route from a node to another one outside of the same level / group"
             )
 
-        if to in [_[0] for _ in self.__graph_belongs_to[self]]:
+        for already_existing_routes in self.__graph_belongs_to[self]:
+            if already_existing_routes[0] is to:
+                raise ChartingException(
+                    f"There is already an established route from {self} to {to}."
+                )
+
+        if isinstance(self, Start) and isinstance(to, Finish):
             raise ChartingException(
-                f"There is already an established route from {self} to {to}."
+                "The direct route from start to finish is meaningless, "
+                "there must be an intermediate state or actions between them."
+            )
+
+        if isinstance(self, Finish):
+            raise ChartingException("The finish node can be only the final destination")
+
+        if isinstance(to, Start):
+            raise ChartingException(
+                "It is not possible to return to the very start. "
+                "It is an abstract node and not a representation of any state or action."
             )
 
     def go_to(self, to: "BaseNode", text: str = "") -> "BaseNode":
@@ -80,28 +96,25 @@ class Finish(BaseNode):
 @dataclass
 class Node(BaseNode, Colored):
     text: str
-
-    def __hash__(self):
-        return hash(f"{id(self)}")
-
-    def __repr__(self):
-        return f"Node {self.text}"  # pragma: nocover
-
-
-@dataclass
-class Group(BaseNode, Colored):
-    text: str
     start: Start = field(init=False)
     finish: Finish = field(init=False)
     __inner_graph: typing.Dict[BaseNode, typing.List[typing.Tuple[BaseNode, str]]] = (
         field(init=False)
     )
 
+    def is_group(self) -> bool:
+        """The node can be a representation of a group / composite state if it contains the other nodes inside it."""
+        return (
+            len(self.__inner_graph) > 2
+        )  # contains anything besides the default start and end nodes
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
-        return f"Group {self.text}"  # pragma: nocover
+        return (
+            f"{'Group' if self.is_group() else 'Node'} {self.text}"  # pragma: nocover
+        )
 
     def __post_init__(self):
         super().__post_init__()
@@ -119,17 +132,11 @@ class Group(BaseNode, Colored):
                     "There must be no nodes in the graph in the same group with the same title."
                 )
 
-    def node(self, title: str, color: typing.Optional[str] = None) -> Node:
+    def node(self, title: str, color: typing.Optional[str] = None) -> "Node":
         self.__check_if_adding_new_element_is_allowed(title)
         node = Node(_graph_ref=self, text=title, _color=color)
         self.__inner_graph[node] = []
         return node
-
-    def group(self, title: str, color: typing.Optional[str] = None) -> "Group":
-        self.__check_if_adding_new_element_is_allowed(title)
-        group = Group(_graph_ref=self, text=title, _color=color)
-        self.__inner_graph[group] = []
-        return group
 
     def fork(self) -> "Fork":
         fork = Fork(_graph_ref=self)
@@ -165,34 +172,31 @@ class GraphDiagram(BaseChart):
     is_vertical: bool = True
 
     __generator: IChartGenerator = field(init=False)
-    __default_group: Group = field(init=False)
+    __base_node: Node = field(init=False)
 
     def __post_init__(self):
         self.__generator = self.generator_cls(self)
-        self.__default_group = Group(_graph_ref=None, text="", _color=None)
+        self.__base_node = Node(_graph_ref=None, text="", _color=None)
 
     @property
     def start(self) -> Start:
-        return self.__default_group.start
+        return self.__base_node.start
 
     @property
     def finish(self) -> Finish:
-        return self.__default_group.finish
+        return self.__base_node.finish
 
     def node(self, title: str, color: typing.Optional[str] = None) -> Node:
-        return self.__default_group.node(title, color)
-
-    def group(self, title: str, color: typing.Optional[str] = None) -> Group:
-        return self.__default_group.group(title, color)
+        return self.__base_node.node(title, color)
 
     def fork(self) -> Fork:
-        return self.__default_group.fork()
+        return self.__base_node.fork()
 
     def join(self) -> Join:
-        return self.__default_group.join()
+        return self.__base_node.join()
 
     def condition(self, color: typing.Optional[str] = None) -> Condition:
-        return self.__default_group.condition(color)
+        return self.__base_node.condition(color)
 
     def generate(self) -> str:
         return self.__generator.generate_graph_diagram()
@@ -202,11 +206,3 @@ class GraphDiagram(BaseChart):
 
     def __str__(self):
         return self.generate()
-
-
-if __name__ == "__main__":
-    x = GraphDiagram("aaa", type)
-    n1 = x.node("1")
-    n2 = x.node("2")
-    n1.go_to(n2, "Hello")
-    print(n1)
