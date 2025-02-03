@@ -18,28 +18,29 @@ class BaseNode:
     def __check_if_interaction_is_allowed(self, to: "BaseNode"):
         if to not in self.__graph_belongs_to:
             raise ChartingException(
-                "You cannot define a route from a node to another one outside of the same level / group"
+                "You cannot define a link from a node to another one outside of the same level / group"
             )
 
         for already_existing_routes in self.__graph_belongs_to[self]:
             if already_existing_routes[0] is to:
                 raise ChartingException(
-                    f"There is already an established route from {self} to {to}."
+                    f"There is already an established link from {self} to {to}."
                 )
 
         if isinstance(self, Start) and isinstance(to, Finish):
             raise ChartingException(
-                "The direct route from start to finish is meaningless, "
-                "there must be an intermediate state or actions between them."
+                "The direct link from start to finish is pointless, these are abstract nodes;"
+                "there must be some intermediate nodes between them."
             )
 
         if isinstance(self, Finish):
-            raise ChartingException("The finish node can be only the final destination")
+            raise ChartingException(
+                "The 'finish' node can only be the destination and not the starting point"
+            )
 
         if isinstance(to, Start):
             raise ChartingException(
-                "It is not possible to return to the very start. "
-                "It is an abstract node and not a representation of any state or action."
+                "The 'start' node can only be the starting point and not the destination"
             )
 
     def go_to(self, to: "BaseNode", text: str = "") -> "BaseNode":
@@ -108,6 +109,9 @@ class Node(BaseNode, Colored):
             len(self.__inner_graph) > 2
         )  # contains anything besides the default start and end nodes
 
+    def is_top_level(self) -> bool:
+        return not self._graph_ref
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
@@ -127,7 +131,7 @@ class Node(BaseNode, Colored):
 
     def __check_if_adding_new_element_is_allowed(self, title: str):
         for nodes in self.__inner_graph:
-            if getattr(nodes, "title", None) == title:
+            if getattr(nodes, "text", None) == title:
                 raise ChartingException(
                     "There must be no nodes in the graph in the same group with the same title."
                 )

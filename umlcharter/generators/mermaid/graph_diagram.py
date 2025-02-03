@@ -12,8 +12,11 @@ from umlcharter.charts.graph_diagram import (
 class MermaidGraphDiagram:
     @staticmethod
     def _remove_line_breaks(string: str) -> str:
-        """Some places do not allow line breaks, replace these with just a plane space"""
-        return string.replace("\n", " ")
+        """
+        Some places do not allow line breaks, replace these with just a plane space.
+        Also, these places do not allow ':' symbol
+        """
+        return string.replace("\n", " ").replace(":", "")
 
     @classmethod
     def generate(cls, sequence_diagram: GraphDiagram) -> str:
@@ -45,11 +48,20 @@ class MermaidGraphDiagram:
                         if node.is_group():
                             generated_dsl += (
                                 f'state "{node.text}" as {node_alias} '
-                                f'{{\n{recursive_graph_generation("", node)}\n}}\n'
+                                f'{{\n{recursive_graph_generation("", node)}}}\n'
                             )
                         else:
                             generated_dsl += f'state "{node.text}" as {node_alias}\n'
-            # second run is to define the routes between the nodes
+                        if node_to_process.is_top_level() and node.color:
+                            # NB: mermaid does not support styling for the nodes inside composite states ("groups") yet.
+                            # So the styling will be applied ONLY to the nodes on the most top level of the graph
+                            class_def = f"cd_{node_alias}"
+                            generated_dsl += (
+                                f"classDef {class_def} fill:{node.color.as_hex()}\n"
+                                f"class {node_alias} {class_def}\n"
+                            )
+
+            # ...second run is to define the routes between the nodes
             for node, routes in inner_graph.items():
                 for route in routes:
                     to_node, route_text = route
