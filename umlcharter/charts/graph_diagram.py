@@ -133,7 +133,7 @@ class Node(BaseNode, Colored):
         for nodes in self.__inner_graph:
             if getattr(nodes, "text", None) == title:
                 raise ChartingException(
-                    "There must be no nodes in the graph in the same group with the same title."
+                    f"There must be no nodes in the graph in the same group with the same title '{title}'."
                 )
 
     def node(self, title: str, color: typing.Optional[str] = None) -> "Node":
