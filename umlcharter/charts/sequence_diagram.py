@@ -4,21 +4,8 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from itertools import chain
 
-from umlcharter.charts.types import BaseChart, Color, ChartingException
+from umlcharter.charts.common import BaseChart, ChartingException, Colored
 from umlcharter.generators.base import IChartGenerator
-
-
-@dataclass
-class Colored:
-    """
-    Used to assign the color to the component of the sequence diagram.
-    """
-
-    _color: typing.Optional[str]
-    color: typing.Optional[Color] = field(init=False)
-
-    def __post_init__(self):
-        self.color = Color(self._color) if self._color else None
 
 
 class Step:
@@ -208,7 +195,7 @@ class SequenceDiagram(BaseChart):
     A sequence of the steps that must be rendered to the diagram DSL - depending on the chosen renderer.
 
     :title: The title of the diagram to display on the top of the diagram
-    :generator_cls: the class of the renderer to be used to generate the diagram
+    :generator_cls: the class of the generator to be used to generate the diagram
     :auto_activation: The flag used to track whether the participant should be activated every time it
         has evoked the action to another participant.
         Once the control flow has returned back and the initial active participant was the target of the action, the
@@ -383,7 +370,7 @@ class SequenceDiagram(BaseChart):
         c = Counter()
         for step in self.__sequence:
             if isinstance(step, ParticipantActivationControl):
-                c[step.participant] += (1 if step.is_active else -1)
+                c[step.participant] += 1 if step.is_active else -1
         return list(+c)
 
     def __add_step(self, step: Step):
@@ -413,7 +400,6 @@ class SequenceDiagram(BaseChart):
             # And every time the flow returns to the previously activated participant, its activation must be ended.
 
             if isinstance(step, ForwardStep):
-
                 if step.to_participant is step.from_participant:
                     # Self-targeting is a special case for the auto-activated sequence diagram, because it must activate
                     # self and deactivate self right after the call.
