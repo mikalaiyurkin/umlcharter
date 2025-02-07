@@ -161,12 +161,12 @@ class Node(BaseNode, Colored):
 @dataclass
 class GraphDiagram(BaseChart):
     """
-    A graph that must be rendered to the diagram DSL - depending on the chosen renderer.
+    A graph that must be rendered to the diagram DSL - depending on the chosen generator.
 
     :title: The title of the diagram to display on the top of the diagram
-    :generator_cls: the class of the renderer to be used to generate the diagram
-    :is_vertical: The boolean flag used to define the rendering orientation of the rendered graph.
-        If is set to True, and therefor the orientation of the diagram is set to render the nodes from top to bottom.
+    :generator_cls: the class of the generator to be used to generate the diagram
+    :is_vertical: The boolean flag used to define the default orientation of the rendered graph.
+        If it is set to True, the orientation of the diagram is set to render the nodes from top to bottom.
         Otherwise, the orientation of the diagram is set to render the nodes from left to right.
         True by default (renders from top to bottom)
     """

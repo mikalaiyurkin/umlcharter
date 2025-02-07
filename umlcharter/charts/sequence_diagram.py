@@ -195,7 +195,7 @@ class SequenceDiagram(BaseChart):
     A sequence of the steps that must be rendered to the diagram DSL - depending on the chosen renderer.
 
     :title: The title of the diagram to display on the top of the diagram
-    :generator_cls: the class of the renderer to be used to generate the diagram
+    :generator_cls: the class of the generator to be used to generate the diagram
     :auto_activation: The flag used to track whether the participant should be activated every time it
         has evoked the action to another participant.
         Once the control flow has returned back and the initial active participant was the target of the action, the
