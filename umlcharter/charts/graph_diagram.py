@@ -68,7 +68,7 @@ class Join(BaseNode):
 
 
 @dataclass
-class Condition(BaseNode, Colored):
+class Condition(BaseNode):
     def __hash__(self):
         return hash(f"{id(self)}")
 
@@ -102,6 +102,7 @@ class Node(BaseNode, Colored):
     __inner_graph: typing.Dict[BaseNode, typing.List[typing.Tuple[BaseNode, str]]] = (
         field(init=False)
     )
+    _notes: list[str] = field(init=False)
 
     def is_group(self) -> bool:
         """The node can be a representation of a group / composite state if it contains the other nodes inside it."""
@@ -128,6 +129,7 @@ class Node(BaseNode, Colored):
             self.start: [],
             self.finish: [],
         }
+        self._notes = []
 
     def __check_if_adding_new_element_is_allowed(self, title: str):
         for nodes in self.__inner_graph:
@@ -152,10 +154,13 @@ class Node(BaseNode, Colored):
         self.__inner_graph[join] = []
         return join
 
-    def condition(self, color: typing.Optional[str] = None) -> "Condition":
-        condition = Condition(_graph_ref=self, _color=color)
+    def condition(self) -> "Condition":
+        condition = Condition(_graph_ref=self)
         self.__inner_graph[condition] = []
         return condition
+
+    def note(self, text: str) -> None:
+        self._notes.append(text)
 
 
 @dataclass
@@ -199,8 +204,8 @@ class GraphDiagram(BaseChart):
     def join(self) -> Join:
         return self.__base_node.join()
 
-    def condition(self, color: typing.Optional[str] = None) -> Condition:
-        return self.__base_node.condition(color)
+    def condition(self) -> Condition:
+        return self.__base_node.condition()
 
     def generate(self) -> str:
         return self.__generator.generate_graph_diagram()

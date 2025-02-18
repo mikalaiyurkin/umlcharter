@@ -143,6 +143,51 @@ n2 --> n9 : Inter-group route
             (
                 Mermaid,
                 """---
+title: Diagram Nested Groups With Notes
+---
+stateDiagram-v2
+state "Group" as n2 {
+  state "Nested Node" as n5
+  note right of n5
+Note for the nested node
+  end note
+}
+note right of n2
+Note for the group
+end note
+state "Outer Node" as n6
+note right of n6
+It is possible to have multiple notes...
+end note
+note right of n6
+...and also split them
+in multi lines
+end note
+""",
+            ),
+        ),
+    )
+    def test_nested_nodes_and_notes(self, generator_cls, output):
+        gd = GraphDiagram(
+            "Diagram Nested Groups With Notes", generator_cls=generator_cls
+        )
+        group = gd.node("Group")
+        nested_node = group.node("Nested Node")
+        node = gd.node("Outer Node")
+
+        group.note("Note for the group")
+        nested_node.note("Note for the nested node")
+        node.note("It is possible to have multiple notes...")
+        node.note("...and also split them\nin multi lines")
+        print(gd)
+        assert str(gd) == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+            (
+                Mermaid,
+                """---
 title: Diagram Joins & Forks
 ---
 stateDiagram-v2

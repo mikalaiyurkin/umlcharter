@@ -63,6 +63,9 @@ class MermaidGraphDiagram:
                                 f"{ident}classDef {class_def} fill:{node.color.as_hex()}\n"
                                 f"{ident}class {node_alias} {class_def}\n"
                             )
+                        notes: list[str] = node._notes  # noqa
+                        for note in notes:
+                            generated_dsl += f"{ident}note right of {node_alias}\n{note}\n{ident}end note\n"
 
             # ...second run is to define the routes between the nodes
             for node, routes in inner_graph.items():
