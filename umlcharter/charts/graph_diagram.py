@@ -51,29 +51,44 @@ class BaseNode:
 
 @dataclass
 class Fork(BaseNode):
+    _notes: list[str] = field(default_factory=list)
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
         return "Fork"  # pragma: nocover
 
+    def note(self, text: str) -> None:
+        self._notes.append(text)
+
 
 @dataclass
 class Join(BaseNode):
+    _notes: list[str] = field(default_factory=list)
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
         return "Join"  # pragma: nocover
 
+    def note(self, text: str) -> None:
+        self._notes.append(text)
+
 
 @dataclass
-class Condition(BaseNode, Colored):
+class Condition(BaseNode):
+    _notes: list[str] = field(default_factory=list)
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
         return "Condition"  # pragma: nocover
+
+    def note(self, text: str) -> None:
+        self._notes.append(text)
 
 
 @dataclass
@@ -97,6 +112,7 @@ class Finish(BaseNode):
 @dataclass
 class Node(BaseNode, Colored):
     text: str
+    _notes: list[str] = field(default_factory=list)
     start: Start = field(init=False)
     finish: Finish = field(init=False)
     __inner_graph: typing.Dict[BaseNode, typing.List[typing.Tuple[BaseNode, str]]] = (
@@ -128,6 +144,7 @@ class Node(BaseNode, Colored):
             self.start: [],
             self.finish: [],
         }
+        self._notes = []
 
     def __check_if_adding_new_element_is_allowed(self, title: str):
         for nodes in self.__inner_graph:
@@ -152,10 +169,13 @@ class Node(BaseNode, Colored):
         self.__inner_graph[join] = []
         return join
 
-    def condition(self, color: typing.Optional[str] = None) -> "Condition":
-        condition = Condition(_graph_ref=self, _color=color)
+    def condition(self) -> "Condition":
+        condition = Condition(_graph_ref=self)
         self.__inner_graph[condition] = []
         return condition
+
+    def note(self, text: str) -> None:
+        self._notes.append(text)
 
 
 @dataclass
@@ -199,8 +219,8 @@ class GraphDiagram(BaseChart):
     def join(self) -> Join:
         return self.__base_node.join()
 
-    def condition(self, color: typing.Optional[str] = None) -> Condition:
-        return self.__base_node.condition(color)
+    def condition(self) -> Condition:
+        return self.__base_node.condition()
 
     def generate(self) -> str:
         return self.__generator.generate_graph_diagram()
