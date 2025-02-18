@@ -111,11 +111,11 @@ title: Diagram Nested Groups
 ---
 stateDiagram-v2
 state "Group #1" as n2 {
-state "Nested Group #1" as n5 {
-state "Nested Node #1" as n8
-}
-[*] --> n5 : Go deeper!
-n5 --> [*] : It was deep, indeed
+  state "Nested Group #1" as n5 {
+    state "Nested Node #1" as n8
+  }
+  [*] --> n5 : Go deeper!
+  n5 --> [*] : It was deep, indeed
 }
 classDef cd_n2 fill:#769D8F
 class n2 cd_n2

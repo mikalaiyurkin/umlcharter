@@ -28,8 +28,9 @@ class MermaidGraphDiagram:
             generated += "direction LR\n"
 
         def recursive_graph_generation(
-            generated_dsl: str, node_to_process: Node
+            generated_dsl: str, node_to_process: Node, depth: int
         ) -> str:
+            ident = " " * depth
             inner_graph = node_to_process._Node__inner_graph  # noqa
             # iterate once to define the states first...
             for node, routes in inner_graph.items():
@@ -39,35 +40,37 @@ class MermaidGraphDiagram:
                     node_alias = f"n{len(aliases)}"
                     aliases[node] = node_alias
                     if isinstance(node, Condition):
-                        generated_dsl += f"state {node_alias} <<choice>>\n"
+                        generated_dsl += f"{ident}state {node_alias} <<choice>>\n"
                     if isinstance(node, Join):
-                        generated_dsl += f"state {node_alias} <<join>>\n"
+                        generated_dsl += f"{ident}state {node_alias} <<join>>\n"
                     if isinstance(node, Fork):
-                        generated_dsl += f"state {node_alias} <<fork>>\n"
+                        generated_dsl += f"{ident}state {node_alias} <<fork>>\n"
                     if isinstance(node, Node):
                         if node.is_group():
                             generated_dsl += (
-                                f'state "{node.text}" as {node_alias} '
-                                f'{{\n{recursive_graph_generation("", node)}}}\n'
+                                f'{ident}state "{node.text}" as {node_alias} '
+                                f'{{\n{recursive_graph_generation("", node, depth + 2)}{ident}}}\n'
                             )
                         else:
-                            generated_dsl += f'state "{node.text}" as {node_alias}\n'
+                            generated_dsl += (
+                                f'{ident}state "{node.text}" as {node_alias}\n'
+                            )
                         if node_to_process.is_top_level() and node.color:
                             # NB: mermaid does not support styling for the nodes inside composite states ("groups") yet.
                             # So the styling will be applied ONLY to the nodes on the most top level of the graph
                             class_def = f"cd_{node_alias}"
                             generated_dsl += (
-                                f"classDef {class_def} fill:{node.color.as_hex()}\n"
-                                f"class {node_alias} {class_def}\n"
+                                f"{ident}classDef {class_def} fill:{node.color.as_hex()}\n"
+                                f"{ident}class {node_alias} {class_def}\n"
                             )
 
             # ...second run is to define the routes between the nodes
             for node, routes in inner_graph.items():
                 for route in routes:
                     to_node, route_text = route
-                    generated_dsl += f"{aliases[node]} --> {aliases[to_node]} : {cls._remove_line_breaks(route_text)}\n"
+                    generated_dsl += f"{ident}{aliases[node]} --> {aliases[to_node]} : {cls._remove_line_breaks(route_text)}\n"
 
             return generated_dsl
 
         base_node: Node = sequence_diagram._GraphDiagram__base_node  # noqa
-        return recursive_graph_generation(generated, base_node)
+        return recursive_graph_generation(generated, base_node, 0)
