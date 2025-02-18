@@ -1,11 +1,11 @@
 from abc import ABC
 
-from umlcharter.charts.types import BaseChart
+from umlcharter.charts.common import BaseChart
 
 
 class IChartGenerator(ABC):
     """
-    Abstract parent class for the generators. Define the interfaces.
+    Abstract parent class for the generators. Defines the interfaces.
     """
 
     ref: BaseChart
@@ -14,4 +14,7 @@ class IChartGenerator(ABC):
         self.ref = ref
 
     def generate_sequence_diagram(self) -> str:
+        raise NotImplementedError  # pragma: nocover
+
+    def generate_graph_diagram(self) -> str:
         raise NotImplementedError  # pragma: nocover

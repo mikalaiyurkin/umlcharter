@@ -118,7 +118,7 @@ class D2SequenceDiagram:
 
             if isinstance(step, GroupControl):
                 if step.is_active:
-                    generated += f"group{custom_element_counter}: \[GROUP\] {cls._line_break(step.text)}: {{"
+                    generated += rf"group{custom_element_counter}: \[GROUP\] {cls._line_break(step.text)}: {{"
                     if step.color:
                         generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
                     generated += "\n"
@@ -128,7 +128,7 @@ class D2SequenceDiagram:
 
             if isinstance(step, LoopControl):
                 if step.is_active:
-                    generated += f"loop{custom_element_counter}: \[LOOP\] {cls._line_break(step.how_many_iterations)}: {{"
+                    generated += rf"loop{custom_element_counter}: \[LOOP\] {cls._line_break(step.how_many_iterations)}: {{"
                     if step.color:
                         generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
                     generated += "\n"
@@ -138,7 +138,7 @@ class D2SequenceDiagram:
 
             if isinstance(step, ConditionControl):
                 if step.is_active:
-                    generated += f"alt{custom_element_counter}: \[ALT\] {{"
+                    generated += rf"alt{custom_element_counter}: \[ALT\] {{"
                     if step.color:
                         generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
                     generated += "\n"
@@ -148,7 +148,7 @@ class D2SequenceDiagram:
 
             if isinstance(step, CaseControl):
                 if step.is_active:
-                    generated += f"case{custom_element_counter}: \[CASE\] {cls._line_break(step.text)}: {{"
+                    generated += rf"case{custom_element_counter}: \[CASE\] {cls._line_break(step.text)}: {{"
                     if step.color:
                         generated += f'\nstyle: {{\nfill: "{step.color.as_hex()}" \n}}'
                     generated += "\n"

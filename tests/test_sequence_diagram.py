@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from umlcharter import SequenceDiagram, Mermaid, PlantUML, D2, SequenceDiagramOrg
-from umlcharter.charts.types import ChartingException
+from umlcharter.charts.common import ChartingException
 
 
 class TestSequenceDiagram:
@@ -393,7 +393,7 @@ deactivate p1
 activate p1
 p1->>p1: Self-targeting at the end
 deactivate p1
-"""
+""",
             ),
             (
                 PlantUML,
@@ -418,7 +418,7 @@ activate p1
 p1->p1: Self-targeting at the end
 deactivate p1
 @enduml
-"""
+""",
             ),
             (
                 D2,
@@ -433,7 +433,7 @@ p2.2 -> p2.2: Self-targeting while being active
 p2.2 -> p1.1: '' {style.stroke-dash: 3}
 p1.3 -> p1.3: Self-targeting at the end
 }
-"""
+""",
             ),
             (
                 SequenceDiagramOrg,
@@ -454,9 +454,9 @@ deactivate p1
 activate p1
 p1->p1: Self-targeting at the end
 deactivate p1
-"""
-            )
-        )
+""",
+            ),
+        ),
     )
     def test_self_targeting_with_auto_activation(self, generator_cls, output):
         sd = SequenceDiagram("Self-targeting", generator_cls, auto_activation=True)
