@@ -143,51 +143,6 @@ n2 --> n9 : Inter-group route
             (
                 Mermaid,
                 """---
-title: Diagram Nested Groups With Notes
----
-stateDiagram-v2
-state "Group" as n2 {
-  state "Nested Node" as n5
-  note right of n5
-Note for the nested node
-  end note
-}
-note right of n2
-Note for the group
-end note
-state "Outer Node" as n6
-note right of n6
-It is possible to have multiple notes...
-end note
-note right of n6
-...and also split them
-in multi lines
-end note
-""",
-            ),
-        ),
-    )
-    def test_nested_nodes_and_notes(self, generator_cls, output):
-        gd = GraphDiagram(
-            "Diagram Nested Groups With Notes", generator_cls=generator_cls
-        )
-        group = gd.node("Group")
-        nested_node = group.node("Nested Node")
-        node = gd.node("Outer Node")
-
-        group.note("Note for the group")
-        nested_node.note("Note for the nested node")
-        node.note("It is possible to have multiple notes...")
-        node.note("...and also split them\nin multi lines")
-        print(gd)
-        assert str(gd) == output
-
-    @pytest.mark.parametrize(
-        "generator_cls,output",
-        (
-            (
-                Mermaid,
-                """---
 title: Diagram Joins & Forks
 ---
 stateDiagram-v2
@@ -263,6 +218,79 @@ n4 --> [*] :
         c1.go_to(n2, "Need a second one")
         n2.go_to(gd.finish)
         c1.go_to(gd.finish, "Nah, try again")
+        assert str(gd) == output
+
+    @pytest.mark.parametrize(
+        "generator_cls,output",
+        (
+            (
+                Mermaid,
+                """---
+title: Complex Diagram With Notes
+---
+stateDiagram-v2
+state "Group" as n2 {
+  state "Nested Node" as n5
+  note right of n5
+Note for the nested node
+  end note
+}
+note right of n2
+Note for the group
+end note
+state "Outer Node" as n6
+note right of n6
+It is possible to have multiple notes...
+end note
+note right of n6
+...and also split them
+in multi lines
+end note
+state n7 <<fork>>
+note right of n7
+Note for fork
+end note
+state n8 <<choice>>
+note right of n8
+Note for condition
+end note
+state n9 <<join>>
+note right of n9
+Note for join
+end note
+n2 --> n7 : 
+n7 --> n8 : 
+n7 --> n9 : 
+n8 --> n9 : 
+n8 --> [*] : 
+""",
+            ),
+        ),
+    )
+    def test_complex_with_notes(self, generator_cls, output):
+        gd = GraphDiagram("Complex Diagram With Notes", generator_cls=generator_cls)
+        group = gd.node("Group")
+        nested_node = group.node("Nested Node")
+        node = gd.node("Outer Node")
+        fork = gd.fork()
+        condition = gd.condition()
+        join = gd.join()
+
+        group.go_to(fork)
+        fork.go_to(condition)
+        condition.go_to(join)
+        condition.go_to(gd.finish)
+        fork.go_to(join)
+
+        group.note("Note for the group")
+        nested_node.note("Note for the nested node")
+        node.note("It is possible to have multiple notes...")
+        node.note("...and also split them\nin multi lines")
+
+        fork.note("Note for fork")
+        condition.note("Note for condition")
+        join.note("Note for join")
+
         assert str(gd) == output
 
     @pytest.mark.parametrize(

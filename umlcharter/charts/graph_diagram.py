@@ -51,29 +51,44 @@ class BaseNode:
 
 @dataclass
 class Fork(BaseNode):
+    _notes: list[str] = field(default_factory=list)
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
         return "Fork"  # pragma: nocover
 
+    def note(self, text: str) -> None:
+        self._notes.append(text)
+
 
 @dataclass
 class Join(BaseNode):
+    _notes: list[str] = field(default_factory=list)
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
         return "Join"  # pragma: nocover
 
+    def note(self, text: str) -> None:
+        self._notes.append(text)
+
 
 @dataclass
 class Condition(BaseNode):
+    _notes: list[str] = field(default_factory=list)
+
     def __hash__(self):
         return hash(f"{id(self)}")
 
     def __repr__(self):
         return "Condition"  # pragma: nocover
+
+    def note(self, text: str) -> None:
+        self._notes.append(text)
 
 
 @dataclass
@@ -97,12 +112,12 @@ class Finish(BaseNode):
 @dataclass
 class Node(BaseNode, Colored):
     text: str
+    _notes: list[str] = field(default_factory=list)
     start: Start = field(init=False)
     finish: Finish = field(init=False)
     __inner_graph: typing.Dict[BaseNode, typing.List[typing.Tuple[BaseNode, str]]] = (
         field(init=False)
     )
-    _notes: list[str] = field(init=False)
 
     def is_group(self) -> bool:
         """The node can be a representation of a group / composite state if it contains the other nodes inside it."""
