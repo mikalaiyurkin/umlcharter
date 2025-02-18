@@ -321,3 +321,39 @@ for dsl in (Mermaid,):
 | Mermaid             | ![image](images/condition_mermaid.png) |
 
 </details>
+
+<details>
+<summary><h3>Notes</h3></summary>
+
+To provide commentaries or notes regarding certain parts of the process described in the graph, 
+the special method `note` can be used.
+This method will attach the special separate note to the generated diagram, associated with the 
+element of the graph used to call this method.
+The notes can be added to:
+- nodes
+- groups of nodes
+- forks and joins
+- conditions
+
+```python
+from umlcharter import GraphDiagram, Mermaid
+
+for dsl in (Mermaid,):
+    gd = GraphDiagram("Notes", dsl)
+    group = gd.node("Group")
+    nested_node = group.node("Nested Node")
+    node = gd.node("Outer Node")
+
+    group.note("Note for the group")
+    nested_node.note("Note for the nested node")
+    node.note("It is possible to have multiple notes...")
+    node.note("...and also\nexplicitly\nsplit them\nin multiple\nlines")
+
+    print(gd)
+```
+
+| DSL                 |           Visualization            |
+|---------------------|:----------------------------------:|
+| Mermaid             | ![image](images/notes_mermaid.png) |
+
+</details>
