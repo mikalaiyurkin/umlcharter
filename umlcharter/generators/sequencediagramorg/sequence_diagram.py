@@ -34,10 +34,10 @@ class SequenceDiagramOrgSequenceDiagram:
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: typing.List[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
-        first_case = False
+        first_case: bool = False
         last_targeted_participant: SequenceDiagramParticipant | None = None
-        aliases = {}
-        aliases_counter = 1
+        aliases: typing.Dict[SequenceDiagramParticipant, str] = {}
+        aliases_counter: int = 1
 
         participant_types_map = {
             "default": "participant",

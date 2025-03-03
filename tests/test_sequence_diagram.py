@@ -496,6 +496,12 @@ p2-->>p1: Return to first
 deactivate p2
 deactivate p1
 end
+activate p3
+p3->>p1: 
+activate p1
+p1-->>p3: Short reverse direct connection
+deactivate p1
+deactivate p3
 """,
             ),
             (
@@ -519,6 +525,13 @@ p2-->p1: Return to first
 deactivate p2
 deactivate p1
 end
+p3 -[hidden]-> p3
+activate p3 
+p3->p1: 
+activate p1 
+p1-->p3: Short reverse direct connection
+deactivate p1
+deactivate p3
 @enduml
 """,
             ),
@@ -540,6 +553,8 @@ p3.2 -> p2.1: Return to second {style.stroke-dash: 3}
 }
 p2.1 -> p1.0: Return to first {style.stroke-dash: 3}
 }
+p3.3 -> p1.4: ''
+p1.4 -> p3.3: Short reverse direct connection {style.stroke-dash: 3}
 }
 """,
             ),
@@ -563,6 +578,12 @@ p2-->p1: Return to first
 deactivate p2
 deactivate p1
 end
+activate p3
+p3->p1: 
+activate p1
+p1-->p3: Short reverse direct connection
+deactivate p1
+deactivate p3
 """,
             ),
         ),
@@ -583,6 +604,8 @@ end
             ):
                 second.go_to(third, "Go to third").return_to(second, "Return to second")
             second.return_to(first, "Return to first")
+
+        third.go_to(first).return_to(third, "Short reverse direct connection")
         assert str(sd) == output
 
     @pytest.mark.parametrize(
@@ -1105,7 +1128,6 @@ activate p5
 
         sd.group_participants("A first\ngroup", grouped_2, grouped_3)
         sd.group_participants("A second\ngroup", grouped_5)
-        print(str(sd))
         assert str(sd) == output
 
     @pytest.mark.parametrize(
@@ -1237,7 +1259,6 @@ activate p5
         ).go_to(p5, "Message!")
 
         sd.group_participants("A third\ngroup", p4, p5)
-        print(sd)
         assert str(sd) == output
 
     @pytest.mark.parametrize(
@@ -1420,7 +1441,6 @@ deactivate p1
         entity.return_to(control, "Return").return_to(boundary, "Return").return_to(
             actor, "Return"
         )
-        print(sd)
         assert str(sd) == output
 
     def test_invalid_color_string(self):
