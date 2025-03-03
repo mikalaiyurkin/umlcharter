@@ -29,13 +29,14 @@ class PlantUMLSequenceDiagram:
         ] = sequence_diagram._SequenceDiagram__participants  # noqa
         sequence: typing.List[Step] = sequence_diagram._SequenceDiagram__sequence  # noqa
 
-        first_case = False
+        first_case: bool = False
         deactivation_just_has_happened_for_step: SequenceDiagramParticipant | None = (
             None
         )
+        group_ended_recently: bool = False
         last_targeted_participant: SequenceDiagramParticipant | None = None
-        aliases = {}
-        aliases_counter = 1
+        aliases: typing.Dict[SequenceDiagramParticipant, str] = {}
+        aliases_counter: int = 1
 
         participant_types_map = {
             "default": "participant",
@@ -72,14 +73,21 @@ class PlantUMLSequenceDiagram:
                     # NB! The magic of PlantUML:
                     # you cannot activate the participant right after you have deactivated it,
                     # so you have to place something in between.
-                    # Luckily, PlantUML supports invisible messages we can use as separator to split the sequence
+                    # Also, there is known ancient bug that the activation does not also work properly if used
+                    # after the end of the group (any kind of group)
+                    # (https://forum.plantuml.net/8228/activation-after-group-end-does-not-work)
+                    # Luckily, PlantUML supports invisible messages we can use as separator to split the sequence.
+                    # This invisible messages somehow "restarts" the activation logic (?) and it renders correctly.
+                    # NB 2: this dirty magic is needed for the default Puma architecture,
+                    # it seems the Teoz does not have this issue, but Teoz is not stable (https://plantuml.com/teoz)
                     if (
                         deactivation_just_has_happened_for_step
                         and step.participant == deactivation_just_has_happened_for_step
-                    ):
+                    ) or group_ended_recently:
                         generated += f"{aliases[step.participant]} -[hidden]-> {aliases[step.participant]}\n"
                     generated += f"activate {aliases[step.participant]} {step.color.as_hex() if step.color else ''}\n"
                     deactivation_just_has_happened_for_step = None
+                    group_ended_recently = False
                 else:
                     generated += f"deactivate {aliases[step.participant]}\n"
                     deactivation_just_has_happened_for_step = step.participant
@@ -106,6 +114,7 @@ class PlantUMLSequenceDiagram:
                     )
                 else:
                     generated += "end\n"
+                    group_ended_recently = True
 
             if isinstance(step, LoopControl):
                 if step.is_active:
@@ -115,6 +124,7 @@ class PlantUMLSequenceDiagram:
                     )
                 else:
                     generated += "end\n"
+                    group_ended_recently = True
 
             if isinstance(step, ConditionControl):
                 if step.is_active:
@@ -123,6 +133,7 @@ class PlantUMLSequenceDiagram:
                 else:
                     generated += "end\n"
                     first_case = False
+                    group_ended_recently = True
 
             if isinstance(step, CaseControl):
                 if step.is_active:
