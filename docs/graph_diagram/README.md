@@ -2,13 +2,14 @@
 
 ### Supported DSLs
 
-|                  | Mermaid                                                                          | 
-|------------------|----------------------------------------------------------------------------------|
-| Any limitations? | a) Styling not supported for the elements inside the groups ("composite states") |
+|                  | Mermaid                                                                          | PlantUML         |
+|------------------|----------------------------------------------------------------------------------|------------------|
+| Any limitations? | a) Styling not supported for the elements inside the groups ("composite states") | ✅ No limitations |
 
 For more details about the supported DSLs, please refer to the next links:
 
 - [Mermaid](https://mermaid.js.org/)
+- [PlantUML](https://plantuml.com/)
 
 ### Quick Start
 
@@ -133,9 +134,9 @@ gd_from_left_to_right = GraphDiagram("From Left to Right", Mermaid, is_vertical=
 
 A more complex example displaying the different orientation:
 ```python
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 
-for dsl in (Mermaid, ):
+for dsl in (Mermaid, PlantUML):
     for is_vertical in (True, False):
         gd = GraphDiagram(f"Orientation:\n{'Vertical' if is_vertical else 'Horizontal'}", dsl, is_vertical=is_vertical)
         a = gd.node("A")
@@ -152,9 +153,10 @@ for dsl in (Mermaid, ):
 ```
 
 
-| DSL     |     Visualization (vertical orientation)      | Visualization (horizontal orientation)          |
-|---------|:---------------------------------------------:|:------------------------------------------------|
-| Mermaid | ![image](images/complex_mermaid_vertical.png) | ![image](images/complex_mermaid_horizontal.png) |
+| DSL      |      Visualization (vertical orientation)      | Visualization (horizontal orientation)           |
+|----------|:----------------------------------------------:|:-------------------------------------------------|
+| Mermaid  | ![image](images/complex_mermaid_vertical.png)  | ![image](images/complex_mermaid_horizontal.png)  |
+| PlantUML | ![image](images/complex_plantuml_vertical.png) | ![image](images/complex_plantuml_horizontal.png) |
 
 
 ### Styling
@@ -182,9 +184,9 @@ It means if you have a container of nodes, then these nodes inside the container
 but cannot interact with the nodes outside of it._
 
 ```python
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 
-for dsl in (Mermaid,):
+for dsl in (Mermaid, PlantUML):
     gd = GraphDiagram("Containerized Nodes", dsl)
     green_color = "769D8F"
     container = gd.node("Group", color=green_color)
@@ -197,9 +199,10 @@ for dsl in (Mermaid,):
     print(gd)
 ```
 
-| DSL                 |                                                      Visualization                                                       |
-|---------------------|:------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid             | ❌ Styling of the nested elements is not supported at the moment of writing ❌<br/> ![image](images/container_mermaid.png) |
+| DSL      |                                                      Visualization                                                       |
+|----------|:------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  | ❌ Styling of the nested elements is not supported at the moment of writing ❌<br/> ![image](images/container_mermaid.png) |
+| PlantUML |                                         ![image](images/container_plantuml.png)                                          |
 
 </details>
 
@@ -217,9 +220,9 @@ also not allowed to define the `start` as the destination for the transition bet
 And you cannot use `finish` as the start of the transition._
 
 ```python
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 
-for dsl in (Mermaid,):
+for dsl in (Mermaid, PlantUML):
     gd = GraphDiagram("Start & Finish", dsl)
     node = gd.node("Node")
 
@@ -228,7 +231,7 @@ for dsl in (Mermaid,):
 
     container = gd.node("Group of nodes")
     nested_node = container.node("Nested Node")
-    
+
     # container-level start & finish
     container.start.go_to(nested_node).go_to(container.finish)
 
@@ -236,9 +239,10 @@ for dsl in (Mermaid,):
     print(gd)
 ```
 
-| DSL                 |               Visualization               |
-|---------------------|:-----------------------------------------:|
-| Mermaid             | ![image](images/start_finish_mermaid.png) |
+| DSL      |               Visualization                |
+|----------|:------------------------------------------:|
+| Mermaid  | ![image](images/start_finish_mermaid.png)  |
+| PlantUML | ![image](images/start_finish_plantuml.png) |
 
 </details>
 
@@ -249,10 +253,9 @@ The special methods `fork` and `join` can be used to define the special "fork" a
 beginning and the end of the parallel processes correspondingly.
 
 ```python
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 
-for dsl in (Mermaid,):
-
+for dsl in (Mermaid, PlantUML):
     gd = GraphDiagram("Parallel Processes", dsl)
     a = gd.node("A")
     b = gd.node("B")
@@ -274,9 +277,10 @@ for dsl in (Mermaid,):
     print(gd)
 ```
 
-| DSL                 |             Visualization             |
-|---------------------|:-------------------------------------:|
-| Mermaid             | ![image](images/parallel_mermaid.png) |
+| DSL      |             Visualization             |
+|----------|:-------------------------------------:|
+| Mermaid  | ![image](images/parallel_mermaid.png) |
+| PlantUML | ![image](images/parallel_plantuml.png) |
 
 </details>
 
@@ -286,9 +290,9 @@ for dsl in (Mermaid,):
 To define the conditional node that can control the direction of the flow, you can use method `condition`:
 
 ```python
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 
-for dsl in (Mermaid,):
+for dsl in (Mermaid, PlantUML):
     gd = GraphDiagram("Condition", dsl)
     initial = gd.node("You are a\nsweet-tooth")
 
@@ -316,9 +320,10 @@ for dsl in (Mermaid,):
     print(gd)
 ```
 
-| DSL                 |             Visualization              |
-|---------------------|:--------------------------------------:|
-| Mermaid             | ![image](images/condition_mermaid.png) |
+| DSL      |              Visualization              |
+|----------|:---------------------------------------:|
+| Mermaid  | ![image](images/condition_mermaid.png)  |
+| PlantUML | ![image](images/condition_plantuml.png) |
 
 </details>
 
@@ -336,9 +341,9 @@ The notes can be added to:
 - conditions
 
 ```python
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 
-for dsl in (Mermaid,):
+for dsl in (Mermaid, PlantUML):
     gd = GraphDiagram("Notes", dsl)
     group = gd.node("Group")
     nested_node = group.node("Nested Node")
@@ -352,8 +357,9 @@ for dsl in (Mermaid,):
     print(gd)
 ```
 
-| DSL                 |           Visualization            |
-|---------------------|:----------------------------------:|
-| Mermaid             | ![image](images/notes_mermaid.png) |
+| DSL      |            Visualization            |
+|----------|:-----------------------------------:|
+| Mermaid  | ![image](images/notes_mermaid.png)  |
+| PlantUML | ![image](images/notes_plantuml.png) |
 
 </details>

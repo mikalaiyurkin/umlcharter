@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from umlcharter import GraphDiagram, Mermaid
+from umlcharter import GraphDiagram, Mermaid, PlantUML
 from umlcharter.charts.common import ChartingException
 
 
@@ -16,6 +16,14 @@ class TestGraphDiagram:
 title: Diagram No Nodes
 ---
 stateDiagram-v2
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram\\nNo Nodes
+hide empty description
+@enduml
 """,
             ),
         ),
@@ -35,6 +43,16 @@ title: Diagram Only Nodes
 stateDiagram-v2
 state "Node #1" as n2
 state "Node #2" as n3
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram Only Nodes
+hide empty description
+state "Node #1" as n2
+state "Node #2" as n3
+@enduml
 """,
             ),
         ),
@@ -58,6 +76,18 @@ state "Node #1" as n2
 state "Node #2" as n3
 n2 --> n3 : Hello
 n3 --> n2 : Hi!
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram Nodes & Routes
+hide empty description
+state "Node #1" as n2
+state "Node #2" as n3
+n2 --> n3 : Hello
+n3 --> n2 : Hi!
+@enduml
 """,
             ),
         ),
@@ -85,6 +115,20 @@ state "Node #2" as n3
 n2 --> n3 : Hello!
 n3 --> n2 : Hi!
 n3 --> [*] : Finish!
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram Nodes & Routes
+hide empty description
+state "Node #1" as n2
+state "Node #2" as n3
+[*] --> n2 : Start!
+n2 --> n3 : Hello!
+n3 --> n2 : Hi!
+n3 --> [*] : Finish!
+@enduml
 """,
             ),
         ),
@@ -123,6 +167,23 @@ state "Group #2" as n9
 n2 --> n9 : Inter-group route
 """,
             ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram Nested Groups
+hide empty description
+state "Group #1" as n2 #769D8F {
+  state "Nested Group #1" as n5 #769D8F {
+    state "Nested\\nNode #1" as n8 #769D8F
+  }
+  [*] --> n5 : Go deeper!
+  n5 --> [*] : It was deep, indeed
+}
+state "Group #2" as n9
+n2 --> n9 : Inter-group\\nroute
+@enduml
+""",
+            ),
         ),
     )
     def test_nested_nodes(self, generator_cls, output):
@@ -131,8 +192,8 @@ n2 --> n9 : Inter-group route
         group1 = gd.node("Group #1", color=green_color)
         group2 = gd.node("Group #2")
         nested_group1 = group1.node("Nested Group #1", green_color)
-        nested_group1.node("Nested Node #1", green_color)
-        group1.go_to(group2, "Inter-group route")
+        nested_group1.node("Nested\nNode #1", green_color)
+        group1.go_to(group2, "Inter-group\nroute")
         group1.start.go_to(nested_group1, "Go deeper!")
         nested_group1.go_to(group1.finish, "It was deep, indeed")
         assert str(gd) == output
@@ -164,6 +225,28 @@ n5 --> n7 :
 n6 --> n2 : Choose the easy one
 n6 --> n3 : Choose the hard one
 n7 --> [*] : 
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram Joins & Forks
+hide empty description
+state "Short Path" as n2 #769D8F
+state "Long Path #1" as n3
+state "Long Path #2" as n4
+state "Long Path #3" as n5 #769D8F
+state n6 <<fork>>
+state n7 <<join>>
+[*] --> n6 : Choose your path
+n2 --> n7 : It was easy, ha!
+n3 --> n4
+n4 --> n5 : ... still going ...
+n5 --> n7
+n6 --> n2 : Choose the easy one
+n6 --> n3 : Choose the hard one
+n7 --> [*]
+@enduml
 """,
             ),
         ),
@@ -204,6 +287,22 @@ n2 --> n3 : Make a choice
 n3 --> n4 : Need a second one
 n3 --> [*] : Nah, try again
 n4 --> [*] : 
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Diagram Conditions
+hide empty description
+state "Node #1" as n2
+state n3 <<choice>>
+state "Node (conditional) #2" as n4
+[*] --> n2 : Go to first
+n2 --> n3 : Make a choice
+n3 --> n4 : Need a second one
+n3 --> [*] : Nah, try again
+n4 --> [*]
+@enduml
 """,
             ),
         ),
@@ -263,6 +362,33 @@ n7 --> n8 :
 n7 --> n9 : 
 n8 --> n9 : 
 n8 --> [*] : 
+""",
+            ),
+            (
+                PlantUML,
+                """@startuml
+title Complex Diagram With Notes
+hide empty description
+state "Group" as n2 {
+  state "Nested Node" as n5
+  note right of n5 : Note for the nested node
+}
+note right of n2 : Note for the group
+state "Outer Node" as n6
+note right of n6 : It is possible to have multiple notes...
+note right of n6 : ...and also split them\\nin multi lines
+state n7 <<fork>>
+note right of n7 : Note for fork
+state n8 <<choice>>
+note right of n8 : Note for condition
+state n9 <<join>>
+note right of n9 : Note for join
+n2 --> n7
+n7 --> n8
+n7 --> n9
+n8 --> n9
+n8 --> [*]
+@enduml
 """,
             ),
         ),
@@ -331,6 +457,40 @@ n4 --> n5 :
 n5 --> n2 : We are rolling yay!
 """,
             ),
+            (
+                PlantUML,
+                True,
+                """@startuml
+title Diagram: Different Orientation
+hide empty description
+state "Node: #1" as n2
+state "Node: #2" as n3
+state "Node: #3" as n4
+state "Node: #4" as n5
+n2 --> n3
+n3 --> n4
+n4 --> n5
+n5 --> n2 : We are rolling: yay!
+@enduml
+""",
+            ),
+            (
+                PlantUML,
+                False,
+                """@startuml
+title Diagram: Different Orientation
+hide empty description
+state "Node: #1" as n2
+state "Node: #2" as n3
+state "Node: #3" as n4
+state "Node: #4" as n5
+n2 -> n3
+n3 -> n4
+n4 -> n5
+n5 -> n2 : We are rolling: yay!
+@enduml
+""",
+            ),
         ),
     )
     def test_orientation(self, generator_cls, is_vertical, output):
@@ -382,7 +542,7 @@ n5 --> n2 : We are rolling yay!
             n1.go_to(gd.start)
 
     def test_cannot_go_from_abstract_finish(self):
-        gd = GraphDiagram("Finish is not a strtating point", Mock)
+        gd = GraphDiagram("Finish is not a starting point", Mock)
         n1 = gd.node("Node #1")
         with pytest.raises(ChartingException):
             gd.finish.go_to(n1)
