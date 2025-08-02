@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 from umlcharter.charts.common import ChartingException
 
 
@@ -24,6 +24,15 @@ stateDiagram-v2
 title Diagram\\nNo Nodes
 hide empty description
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram\\nNo Nodes\\n\\n"
+    labelloc = t
+    layout=dot
+}
 """,
             ),
         ),
@@ -53,6 +62,17 @@ hide empty description
 state "Node #1" as n2
 state "Node #2" as n3
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram Only Nodes\\n\\n"
+    labelloc = t
+    layout=dot
+    n2 [style = "rounded,filled", shape = "box", label = "Node #1", fillcolor = "lightgrey"]
+    n3 [style = "rounded,filled", shape = "box", label = "Node #2", fillcolor = "lightgrey"]
+}
 """,
             ),
         ),
@@ -88,6 +108,19 @@ state "Node #2" as n3
 n2 --> n3 : Hello
 n3 --> n2 : Hi!
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram Nodes & Routes\\n\\n"
+    labelloc = t
+    layout=dot
+    n2 [style = "rounded,filled", shape = "box", label = "Node #1", fillcolor = "lightgrey"]
+    n3 [style = "rounded,filled", shape = "box", label = "Node #2", fillcolor = "lightgrey"]
+    n2 -> n3 [label = "Hello"]
+    n3 -> n2 [label = "Hi!"]
+}
 """,
             ),
         ),
@@ -129,6 +162,23 @@ n2 --> n3 : Hello!
 n3 --> n2 : Hi!
 n3 --> [*] : Finish!
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram Nodes & Routes\\n\\n"
+    labelloc = t
+    layout=dot
+    n0 [shape = "circle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    n1 [shape = "doublecircle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    n2 [style = "rounded,filled", shape = "box", label = "Node #1", fillcolor = "lightgrey"]
+    n3 [style = "rounded,filled", shape = "box", label = "Node #2", fillcolor = "lightgrey"]
+    n0 -> n2 [label = "Start!"]
+    n2 -> n3 [label = "Hello!"]
+    n3 -> n2 [label = "Hi!"]
+    n3 -> n1 [label = "Finish!"]
+}
 """,
             ),
         ),
@@ -182,6 +232,35 @@ state "Group #1" as n2 #769D8F {
 state "Group #2" as n9
 n2 --> n9 : Inter-group\\nroute
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram Nested Groups\\n\\n"
+    labelloc = t
+    layout=fdp
+    sep=1
+    K=2
+    overlap=scalexy
+    subgraph cluster_n2 {
+        label = "Group #1"
+        style = "filled"
+        fillcolor = "#769D8F"
+        n3 [shape = "circle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+        n4 [shape = "doublecircle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+        subgraph cluster_n5 {
+            label = "Nested Group #1"
+            style = "filled"
+            fillcolor = "#769D8F"
+            n8 [style = "rounded,filled", shape = "box", label = "Nested\\nNode #1", fillcolor = "#769D8F"]
+        }
+        n3 -> cluster_n5 [label = "Go deeper!"]
+        cluster_n5 -> n4 [label = "It was deep, indeed"]
+    }
+    n9 [style = "rounded,filled", shape = "box", label = "Group #2", fillcolor = "lightgrey"]
+    cluster_n2 -> n9 [label = "Inter-group\\nroute"]
+}
 """,
             ),
         ),
@@ -249,6 +328,31 @@ n7 --> [*]
 @enduml
 """,
             ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram Joins & Forks\\n\\n"
+    labelloc = t
+    layout=dot
+    n0 [shape = "circle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    n1 [shape = "doublecircle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    n2 [style = "rounded,filled", shape = "box", label = "Short Path", fillcolor = "#769D8F"]
+    n3 [style = "rounded,filled", shape = "box", label = "Long Path #1", fillcolor = "lightgrey"]
+    n4 [style = "rounded,filled", shape = "box", label = "Long Path #2", fillcolor = "lightgrey"]
+    n5 [style = "rounded,filled", shape = "box", label = "Long Path #3", fillcolor = "#769D8F"]
+    n6 [style = "filled", fillcolor = "black", shape = "box", label = "", height = 0.1]
+    n7 [style = "filled", fillcolor = "black", shape = "box", label = "", height = 0.1]
+    n0 -> n6 [label = "Choose your path"]
+    n2 -> n7 [label = "It was easy, ha!"]
+    n3 -> n4
+    n4 -> n5 [label = "... still going ..."]
+    n5 -> n7
+    n6 -> n2 [label = "Choose the easy one"]
+    n6 -> n3 [label = "Choose the hard one"]
+    n7 -> n1
+}
+""",
+            ),
         ),
     )
     def test_join_and_fork(self, generator_cls, output):
@@ -303,6 +407,25 @@ n3 --> n4 : Need a second one
 n3 --> [*] : Nah, try again
 n4 --> [*]
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Diagram Conditions\\n\\n"
+    labelloc = t
+    layout=dot
+    n0 [shape = "circle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    n1 [shape = "doublecircle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    n2 [style = "rounded,filled", shape = "box", label = "Node #1", fillcolor = "lightgrey"]
+    n3 [style = "filled", fillcolor = "white", shape = "diamond", label = "", height = 0.2, width = 0.2]
+    n4 [style = "rounded,filled", shape = "box", label = "Node (conditional) #2", fillcolor = "lightgrey"]
+    n0 -> n2 [label = "Go to first"]
+    n2 -> n3 [label = "Make a choice"]
+    n3 -> n4 [label = "Need a second one"]
+    n3 -> n1 [label = "Nah, try again"]
+    n4 -> n1
+}
 """,
             ),
         ),
@@ -389,6 +512,46 @@ n7 --> n9
 n8 --> n9
 n8 --> [*]
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                """digraph umlcharter_graph {
+    label = "Complex Diagram With Notes\\n\\n"
+    labelloc = t
+    layout=fdp
+    sep=1
+    K=2
+    overlap=scalexy
+    n1 [shape = "doublecircle", style = "filled", fillcolor = "black", label = "", fixedsize = true, height = 0.2]
+    subgraph cluster_n2 {
+        label = "Group"
+        n5 [style = "rounded,filled", shape = "box", label = "Nested Node", fillcolor = "lightgrey"]
+        note0_for_n5 [shape = "note", style="filled", fillcolor="lightyellow", label="Note for the nested node"]
+        n5 -> note0_for_n5 [style = "dotted"]
+    }
+    n6 [style = "rounded,filled", shape = "box", label = "Outer Node", fillcolor = "lightgrey"]
+    n7 [style = "filled", fillcolor = "black", shape = "box", label = "", height = 0.1]
+    n8 [style = "filled", fillcolor = "white", shape = "diamond", label = "", height = 0.2, width = 0.2]
+    n9 [style = "filled", fillcolor = "black", shape = "box", label = "", height = 0.1]
+    cluster_n2 -> n7
+    note0_for_cluster_n2 [shape = "note", style="filled", fillcolor="lightyellow", label="Note for the group"]
+    cluster_n2 -> note0_for_cluster_n2 [style = "dotted"]
+    note0_for_n6 [shape = "note", style="filled", fillcolor="lightyellow", label="It is possible to have multiple notes..."]
+    n6 -> note0_for_n6 [style = "dotted"]
+    note1_for_n6 [shape = "note", style="filled", fillcolor="lightyellow", label="...and also split them\\nin multi lines"]
+    n6 -> note1_for_n6 [style = "dotted"]
+    n7 -> n8
+    n7 -> n9
+    note0_for_n7 [shape = "note", style="filled", fillcolor="lightyellow", label="Note for fork"]
+    n7 -> note0_for_n7 [style = "dotted"]
+    n8 -> n9
+    n8 -> n1
+    note0_for_n8 [shape = "note", style="filled", fillcolor="lightyellow", label="Note for condition"]
+    n8 -> note0_for_n8 [style = "dotted"]
+    note0_for_n9 [shape = "note", style="filled", fillcolor="lightyellow", label="Note for join"]
+    n9 -> note0_for_n9 [style = "dotted"]
+}
 """,
             ),
         ),
@@ -489,6 +652,43 @@ n3 -> n4
 n4 -> n5
 n5 -> n2 : We are rolling: yay!
 @enduml
+""",
+            ),
+            (
+                Graphviz,
+                True,
+                """digraph umlcharter_graph {
+    label = "Diagram: Different Orientation\\n\\n"
+    labelloc = t
+    layout=dot
+    n2 [style = "rounded,filled", shape = "box", label = "Node: #1", fillcolor = "lightgrey"]
+    n3 [style = "rounded,filled", shape = "box", label = "Node: #2", fillcolor = "lightgrey"]
+    n4 [style = "rounded,filled", shape = "box", label = "Node: #3", fillcolor = "lightgrey"]
+    n5 [style = "rounded,filled", shape = "box", label = "Node: #4", fillcolor = "lightgrey"]
+    n2 -> n3
+    n3 -> n4
+    n4 -> n5
+    n5 -> n2 [label = "We are rolling: yay!"]
+}
+""",
+            ),
+            (
+                Graphviz,
+                False,
+                """digraph umlcharter_graph {
+    label = "Diagram: Different Orientation\\n\\n"
+    labelloc = t
+    layout=dot
+    rankdir=LR
+    n2 [style = "rounded,filled", shape = "box", label = "Node: #1", fillcolor = "lightgrey"]
+    n3 [style = "rounded,filled", shape = "box", label = "Node: #2", fillcolor = "lightgrey"]
+    n4 [style = "rounded,filled", shape = "box", label = "Node: #3", fillcolor = "lightgrey"]
+    n5 [style = "rounded,filled", shape = "box", label = "Node: #4", fillcolor = "lightgrey"]
+    n2 -> n3
+    n3 -> n4
+    n4 -> n5
+    n5 -> n2 [label = "We are rolling: yay!"]
+}
 """,
             ),
         ),
