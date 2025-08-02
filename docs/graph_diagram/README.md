@@ -2,14 +2,15 @@
 
 ### Supported DSLs
 
-|                  | Mermaid                                                                          | PlantUML         |
-|------------------|----------------------------------------------------------------------------------|------------------|
-| Any limitations? | a) Styling not supported for the elements inside the groups ("composite states") | ✅ No limitations |
+|                  | Mermaid                                                                          | PlantUML         | Graphviz                                                                                  |
+|------------------|----------------------------------------------------------------------------------|------------------|-------------------------------------------------------------------------------------------|
+| Any limitations? | a) Styling not supported for the elements inside the groups ("composite states") | ✅ No limitations | a) No orientation support for graphs with elements inside the groups ("composite states") |
 
 For more details about the supported DSLs, please refer to the next links:
 
 - [Mermaid](https://mermaid.js.org/)
 - [PlantUML](https://plantuml.com/)
+- [Graphviz](https://graphviz.org/)
 
 ### Quick Start
 
@@ -134,9 +135,9 @@ gd_from_left_to_right = GraphDiagram("From Left to Right", Mermaid, is_vertical=
 
 A more complex example displaying the different orientation:
 ```python
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, Graphviz):
     for is_vertical in (True, False):
         gd = GraphDiagram(f"Orientation:\n{'Vertical' if is_vertical else 'Horizontal'}", dsl, is_vertical=is_vertical)
         a = gd.node("A")
@@ -153,10 +154,11 @@ for dsl in (Mermaid, PlantUML):
 ```
 
 
-| DSL      |      Visualization (vertical orientation)      | Visualization (horizontal orientation)           |
-|----------|:----------------------------------------------:|:-------------------------------------------------|
-| Mermaid  | ![image](images/complex_mermaid_vertical.png)  | ![image](images/complex_mermaid_horizontal.png)  |
-| PlantUML | ![image](images/complex_plantuml_vertical.png) | ![image](images/complex_plantuml_horizontal.png) |
+| DSL      |      Visualization (vertical orientation)       | Visualization (horizontal orientation)            |
+|----------|:-----------------------------------------------:|:--------------------------------------------------|
+| Mermaid  |  ![image](images/complex_mermaid_vertical.png)  | ![image](images/complex_mermaid_horizontal.png)   |
+| PlantUML | ![image](images/complex_plantuml_vertical.png)  | ![image](images/complex_plantuml_horizontal.png)  |
+| Graphviz | ![image](images/complex_graphviz_vertical.png)  | ![image](images/complex_graphviz_horizontal.png)  |
 
 
 ### Styling
@@ -184,9 +186,9 @@ It means if you have a container of nodes, then these nodes inside the container
 but cannot interact with the nodes outside of it._
 
 ```python
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, Graphviz):
     gd = GraphDiagram("Containerized Nodes", dsl)
     green_color = "769D8F"
     container = gd.node("Group", color=green_color)
@@ -199,10 +201,11 @@ for dsl in (Mermaid, PlantUML):
     print(gd)
 ```
 
-| DSL      |                                                      Visualization                                                       |
-|----------|:------------------------------------------------------------------------------------------------------------------------:|
-| Mermaid  | ❌ Styling of the nested elements is not supported at the moment of writing ❌<br/> ![image](images/container_mermaid.png) |
-| PlantUML |                                         ![image](images/container_plantuml.png)                                          |
+| DSL      |                                                                                               Visualization                                                                                                |
+|----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  |                                          ❌ Styling of the nested elements is not supported at the moment of writing ❌<br/> ![image](images/container_mermaid.png)                                          |
+| PlantUML |                                                                                  ![image](images/container_plantuml.png)                                                                                   |
+| Graphviz | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/>                                        ![image](images/container_graphviz.png) |
 
 </details>
 
@@ -220,9 +223,9 @@ also not allowed to define the `start` as the destination for the transition bet
 And you cannot use `finish` as the start of the transition._
 
 ```python
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, Graphviz):
     gd = GraphDiagram("Start & Finish", dsl)
     node = gd.node("Node")
 
@@ -239,10 +242,11 @@ for dsl in (Mermaid, PlantUML):
     print(gd)
 ```
 
-| DSL      |               Visualization                |
-|----------|:------------------------------------------:|
-| Mermaid  | ![image](images/start_finish_mermaid.png)  |
-| PlantUML | ![image](images/start_finish_plantuml.png) |
+| DSL      |                                                                             Visualization                                                                              |
+|----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  |                                                               ![image](images/start_finish_mermaid.png)                                                                |
+| PlantUML |                                                               ![image](images/start_finish_plantuml.png)                                                               |
+| PlantUML | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/> ![image](images/start_finish_graphviz.png) |
 
 </details>
 
@@ -253,9 +257,9 @@ The special methods `fork` and `join` can be used to define the special "fork" a
 beginning and the end of the parallel processes correspondingly.
 
 ```python
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, Graphviz):
     gd = GraphDiagram("Parallel Processes", dsl)
     a = gd.node("A")
     b = gd.node("B")
@@ -277,10 +281,11 @@ for dsl in (Mermaid, PlantUML):
     print(gd)
 ```
 
-| DSL      |             Visualization             |
-|----------|:-------------------------------------:|
-| Mermaid  | ![image](images/parallel_mermaid.png) |
+| DSL      |             Visualization              |
+|----------|:--------------------------------------:|
+| Mermaid  | ![image](images/parallel_mermaid.png)  |
 | PlantUML | ![image](images/parallel_plantuml.png) |
+| PlantUML | ![image](images/parallel_graphviz.png) |
 
 </details>
 
@@ -290,9 +295,9 @@ for dsl in (Mermaid, PlantUML):
 To define the conditional node that can control the direction of the flow, you can use method `condition`:
 
 ```python
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, Graphviz):
     gd = GraphDiagram("Condition", dsl)
     initial = gd.node("You are a\nsweet-tooth")
 
@@ -324,6 +329,7 @@ for dsl in (Mermaid, PlantUML):
 |----------|:---------------------------------------:|
 | Mermaid  | ![image](images/condition_mermaid.png)  |
 | PlantUML | ![image](images/condition_plantuml.png) |
+| PlantUML | ![image](images/condition_graphviz.png) |
 
 </details>
 
@@ -341,9 +347,9 @@ The notes can be added to:
 - conditions
 
 ```python
-from umlcharter import GraphDiagram, Mermaid, PlantUML
+from umlcharter import GraphDiagram, Mermaid, PlantUML, Graphviz
 
-for dsl in (Mermaid, PlantUML):
+for dsl in (Mermaid, PlantUML, Graphviz):
     gd = GraphDiagram("Notes", dsl)
     group = gd.node("Group")
     nested_node = group.node("Nested Node")
@@ -357,9 +363,10 @@ for dsl in (Mermaid, PlantUML):
     print(gd)
 ```
 
-| DSL      |            Visualization            |
-|----------|:-----------------------------------:|
-| Mermaid  | ![image](images/notes_mermaid.png)  |
-| PlantUML | ![image](images/notes_plantuml.png) |
+| DSL      |                                                                          Visualization                                                                          |
+|----------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Mermaid  |                                                               ![image](images/notes_mermaid.png)                                                                |
+| PlantUML |                                                               ![image](images/notes_plantuml.png)                                                               |
+| PlantUML | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/> ![image](images/notes_graphviz.png) |
 
 </details>
