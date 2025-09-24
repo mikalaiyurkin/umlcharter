@@ -751,3 +751,37 @@ n5 -> n2 : We are rolling: yay!
         gd = GraphDiagram("Directly link start and finish", Mock)
         with pytest.raises(ChartingException):
             gd.start.go_to(gd.finish)
+
+    @pytest.mark.parametrize("generator_cls", (Mermaid, PlantUML, Graphviz))
+    def test_no_cyclic_ref_count(self, generator_cls):
+        gd = GraphDiagram(
+            "Graph without cyclic references to ensure correct memory management",
+            generator_cls=generator_cls,
+        )
+        node = gd.node("Node")
+        fork = gd.fork()
+        join = gd.join()
+        condition = gd.condition()
+        generator = gd._GraphDiagram__generator  # noqa
+
+        for internal_node in (node, fork, join, condition):
+            assert internal_node._graph_ref
+
+        assert generator.ref
+
+        del gd
+
+        import gc
+
+        gc.collect()
+
+        for internal_node in (node, fork, join, condition):
+            with pytest.raises(
+                ReferenceError, match="weakly-referenced object no longer exists"
+            ):
+                assert internal_node._graph_ref
+
+        with pytest.raises(
+            ReferenceError, match="weakly-referenced object no longer exists"
+        ):
+            assert generator.ref

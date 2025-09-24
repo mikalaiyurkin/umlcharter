@@ -1,4 +1,5 @@
 import typing
+import weakref
 from collections import Counter
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -63,7 +64,7 @@ class NoteStep(Colored, Step):
 
 @dataclass
 class SequenceDiagramParticipant(Colored):
-    sequence_ref: "SequenceDiagram"
+    _sequence_ref: "SequenceDiagram"
     title: str
     type_: typing.Literal["actor", "boundary", "control", "entity", "default"] = field(
         init=False, default="default"
@@ -138,7 +139,7 @@ class SequenceDiagramParticipant(Colored):
     def __add_step(
         self, step: typing.Union[ForwardStep, ReturnStep, ParticipantActivationControl]
     ):
-        self.sequence_ref._SequenceDiagram__add_step(step)  # noqa
+        self._sequence_ref._SequenceDiagram__add_step(step)  # noqa
 
     def go_to(
         self, to: "SequenceDiagramParticipant", text: str = ""
@@ -227,7 +228,7 @@ class SequenceDiagram(BaseChart):
         self.__sequence = []
         self.__inside_condition = False
         self.__auto_activation_stack = []
-        self.__generator = self.generator_cls(self)
+        self.__generator = self.generator_cls(weakref.proxy(self))
 
     def participant(
         self, title: str, color: typing.Optional[str] = None
@@ -242,7 +243,7 @@ class SequenceDiagram(BaseChart):
                 f"All participants must have unique titles."
             )
         participant = SequenceDiagramParticipant(
-            title=title, sequence_ref=self, _color=color
+            title=title, _sequence_ref=weakref.proxy(self), _color=color
         )
         # add the participant to the default group
         if self.__default_group not in self.__participants:

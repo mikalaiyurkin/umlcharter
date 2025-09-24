@@ -6,7 +6,7 @@ from .generators.d2.d2 import D2
 from .generators.sequencediagramorg.sequencediagramorg import SequenceDiagramOrg
 from .generators.graphviz.graphviz import Graphviz
 
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
 __all__ = (
     # charts

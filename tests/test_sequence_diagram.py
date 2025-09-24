@@ -1584,3 +1584,33 @@ deactivate p1
         sd.group_participants(group_title_1, first)
         with pytest.raises(ChartingException):
             sd.group_participants(group_title_2, first)
+
+    @pytest.mark.parametrize(
+        "generator_cls", (Mermaid, PlantUML, D2, SequenceDiagramOrg)
+    )
+    def test_no_cyclic_ref_count(self, generator_cls):
+        sd = SequenceDiagram(
+            "Sequence without cyclic references to ensure correct memory management",
+            generator_cls=generator_cls,
+        )
+        participant = sd.participant("Participant")
+        generator = sd._SequenceDiagram__generator  # noqa
+
+        assert participant._sequence_ref
+        assert generator.ref
+
+        del sd
+
+        import gc
+
+        gc.collect()
+
+        with pytest.raises(
+            ReferenceError, match="weakly-referenced object no longer exists"
+        ):
+            assert participant._sequence_ref
+
+        with pytest.raises(
+            ReferenceError, match="weakly-referenced object no longer exists"
+        ):
+            assert generator.ref
