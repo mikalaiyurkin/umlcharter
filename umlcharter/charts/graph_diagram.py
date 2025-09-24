@@ -1,4 +1,5 @@
 import typing
+import weakref
 from dataclasses import dataclass, field
 
 from umlcharter.charts.common import BaseChart, Colored, ChartingException
@@ -138,8 +139,8 @@ class Node(BaseNode, Colored):
 
     def __post_init__(self):
         super().__post_init__()
-        self.start = Start(_graph_ref=self)
-        self.finish = Finish(_graph_ref=self)
+        self.start = Start(_graph_ref=weakref.proxy(self))
+        self.finish = Finish(_graph_ref=weakref.proxy(self))
         self.__inner_graph = {
             self.start: [],
             self.finish: [],
@@ -155,22 +156,22 @@ class Node(BaseNode, Colored):
 
     def node(self, title: str, color: typing.Optional[str] = None) -> "Node":
         self.__check_if_adding_new_element_is_allowed(title)
-        node = Node(_graph_ref=self, text=title, _color=color)
+        node = Node(_graph_ref=weakref.proxy(self), text=title, _color=color)
         self.__inner_graph[node] = []
         return node
 
     def fork(self) -> "Fork":
-        fork = Fork(_graph_ref=self)
+        fork = Fork(_graph_ref=weakref.proxy(self))
         self.__inner_graph[fork] = []
         return fork
 
     def join(self) -> "Join":
-        join = Join(_graph_ref=self)
+        join = Join(_graph_ref=weakref.proxy(self))
         self.__inner_graph[join] = []
         return join
 
     def condition(self) -> "Condition":
-        condition = Condition(_graph_ref=self)
+        condition = Condition(_graph_ref=weakref.proxy(self))
         self.__inner_graph[condition] = []
         return condition
 
@@ -199,7 +200,7 @@ class GraphDiagram(BaseChart):
     __base_node: Node = field(init=False)
 
     def __post_init__(self):
-        self.__generator = self.generator_cls(self)
+        self.__generator = self.generator_cls(weakref.proxy(self))
         self.__base_node = Node(_graph_ref=None, text="", _color=None)
 
     @property
