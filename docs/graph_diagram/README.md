@@ -246,7 +246,7 @@ for dsl in (Mermaid, PlantUML, Graphviz):
 |----------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Mermaid  |                                                               ![image](images/start_finish_mermaid.png)                                                                |
 | PlantUML |                                                               ![image](images/start_finish_plantuml.png)                                                               |
-| PlantUML | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/> ![image](images/start_finish_graphviz.png) |
+| Graphviz | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/> ![image](images/start_finish_graphviz.png) |
 
 </details>
 
@@ -285,7 +285,7 @@ for dsl in (Mermaid, PlantUML, Graphviz):
 |----------|:--------------------------------------:|
 | Mermaid  | ![image](images/parallel_mermaid.png)  |
 | PlantUML | ![image](images/parallel_plantuml.png) |
-| PlantUML | ![image](images/parallel_graphviz.png) |
+| Graphviz | ![image](images/parallel_graphviz.png) |
 
 </details>
 
@@ -329,7 +329,7 @@ for dsl in (Mermaid, PlantUML, Graphviz):
 |----------|:---------------------------------------:|
 | Mermaid  | ![image](images/condition_mermaid.png)  |
 | PlantUML | ![image](images/condition_plantuml.png) |
-| PlantUML | ![image](images/condition_graphviz.png) |
+| Graphviz | ![image](images/condition_graphviz.png) |
 
 </details>
 
@@ -367,6 +367,6 @@ for dsl in (Mermaid, PlantUML, Graphviz):
 |----------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Mermaid  |                                                               ![image](images/notes_mermaid.png)                                                                |
 | PlantUML |                                                               ![image](images/notes_plantuml.png)                                                               |
-| PlantUML | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/> ![image](images/notes_graphviz.png) |
+| Graphviz | ❌ Orientation of the graph is not supported for the graphs with containers, because layout "fdp" does not support it ❌<br/> ![image](images/notes_graphviz.png) |
 
 </details>
