@@ -219,14 +219,14 @@ class SequenceDiagram(BaseChart):
         ]
     ] = field(init=False)
     __generator: IChartGenerator = field(init=False)
-    __inside_condition: bool = field(init=False)
+    __inside_condition: int = field(init=False)
     __default_group: SequenceDiagramParticipantGroup = field(init=False)
 
     def __post_init__(self):
         self.__default_group = SequenceDiagramParticipantGroup(title=None, _color=None)
         self.__participants = {self.__default_group: []}
         self.__sequence = []
-        self.__inside_condition = False
+        self.__inside_condition = 0
         self.__auto_activation_stack = []
         self.__generator = self.generator_cls(weakref.proxy(self))
 
@@ -349,10 +349,10 @@ class SequenceDiagram(BaseChart):
         Explicitly mark the following sequence of steps as performed within some logical "if - else" block
         """
         self.__add_step(ConditionControl(is_active=True, _color=color))
-        self.__inside_condition = True
+        self.__inside_condition += 1
         yield
         self.__add_step(ConditionControl(is_active=False, _color=color))
-        self.__inside_condition = False
+        self.__inside_condition -= 1
 
     @contextmanager
     def case(self, text: str, color: typing.Optional[str] = None):

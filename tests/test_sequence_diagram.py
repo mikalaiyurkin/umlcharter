@@ -721,7 +721,11 @@ alt Want a drama
 activate p1
 p1->>p2: Watch drama
 activate p2
+alt Movie was good
 p2-->>p1: Tears and sadness
+else Movie was bad
+p2-->>p1: Boredom
+end
 deactivate p2
 deactivate p1
 else Want a comedy
@@ -767,7 +771,11 @@ p1 -[hidden]-> p1
 activate p1 
 p1->p2: Watch drama
 activate p2 
+alt #FFFFFF Movie was good
 p2-->p1: Tears and sadness
+else #FFFFFF Movie was bad
+p2-->p1: Boredom
+end
 deactivate p2
 deactivate p1
 else #FFFFFF Want a comedy
@@ -811,26 +819,33 @@ p1: Viewer
 p2: Drama 
 p3: Comedy 
 p1.0 -> p1.0: What would I like to watch today?
-alt1: \\[ALT\\] {
-case2: \\[CASE\\] Want a drama: {
+alt1: \[ALT\] {
+case2: \[CASE\] Want a drama: {
 p1.1 -> p2.2: Watch drama
+alt3: \[ALT\] {
+case4: \[CASE\] Movie was good: {
 p2.2 -> p1.1: Tears and sadness {style.stroke-dash: 3}
 }
-case3: \\[CASE\\] Want a comedy: {
+case5: \[CASE\] Movie was bad: {
+p2.2 -> p1.1: Boredom {style.stroke-dash: 3}
+}
+}
+}
+case6: \[CASE\] Want a comedy: {
 p1.3 -> p3.4: Watch comedy
 p3.4 -> p1.3: Laugh a lot {style.stroke-dash: 3}
 }
 }
 p1.5 -> p1.5: What would I like to watch tomorrow?
-alt4: \\[ALT\\] {
+alt7: \[ALT\] {
 style: {
 fill: "#b2b200" 
 }
-case5: \\[CASE\\] Want a drama: {
+case8: \[CASE\] Want a drama: {
 p1.6 -> p2.7: Watch drama
 p2.7 -> p1.6: Tears and sadness {style.stroke-dash: 3}
 }
-case6: \\[CASE\\] Want a comedy: {
+case9: \[CASE\] Want a comedy: {
 style: {
 fill: "#66b266" 
 }
@@ -854,7 +869,11 @@ alt Want a drama
 activate p1
 p1->p2: Watch drama
 activate p2
+alt Movie was good
 p2-->p1: Tears and sadness
+else Movie was bad
+p2-->p1: Boredom
+end
 deactivate p2
 deactivate p1
 else Want a comedy
@@ -906,7 +925,11 @@ end
                 with viewer.activate():
                     viewer.go_to(drama, "Watch drama")
                     with drama.activate():
-                        drama.return_to(viewer, "Tears and sadness")
+                        with sd.condition():
+                            with sd.case("Movie was good"):
+                                drama.return_to(viewer, "Tears and sadness")
+                            with sd.case("Movie was bad"):
+                                drama.return_to(viewer, "Boredom")
             with sd.case("Want a comedy"):
                 with viewer.activate():
                     viewer.go_to(comedy, "Watch comedy")
